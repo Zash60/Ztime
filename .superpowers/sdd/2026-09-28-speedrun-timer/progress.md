@@ -22,4 +22,5 @@ Task 4: complete (commits 1ebce9c..8fe16fb, tests: node tests/run-test.js tests/
 Task 5: complete (commits 8fe16fb..2e70d96, tests: node tests/run-test.js tests/test-preview.html → 3/3 pass)
 Task 6: complete (commits 2e70d96..d9fd189, tests: node tests/run-test.js tests/test-app.html → 2/2 pass)
 Task 6: Ruling: guarded DOMContentLoaded init with typeof document check in js/app.js — keeps browser behavior identical, allows Node test loader to import file without document — cost if wrong: none, browser path unchanged
+Task 7: complete (commits d9fd189..190f5e6, styling only, no test per plan)
 
