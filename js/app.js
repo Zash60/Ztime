@@ -10,6 +10,10 @@ class App {
     const configContainer = document.getElementById('configContainer');
     const previewContainer = document.getElementById('previewContainer');
 
+    // Test/embedding pages include app.js without the app containers —
+    // auto-init must no-op instead of throwing.
+    if (!configContainer || !previewContainer) return;
+
     this.configPanel = new ConfigPanel(configContainer);
     this.preview = new Preview(previewContainer);
 
