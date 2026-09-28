@@ -18,16 +18,33 @@ class App {
     this.preview = new Preview(previewContainer);
 
     this.configPanel.onGenerate(() => this._handleGenerate());
+    this.configPanel.onCancel(() => {
+      if (this.videoGenerator) this.videoGenerator.cancel();
+    });
 
-    // Update preview when config changes
+    // Update preview + estimate when config changes
     configContainer.addEventListener('change', () => {
       if (this.configPanel.validate()) {
-        this.preview.update(this.configPanel.getConfig());
+        const config = this.configPanel.getConfig();
+        this.preview.update(config);
+        this.configPanel.hideError();
+        this._updateEstimate();
       }
     });
 
-    // Initial preview
+    // Initial preview + estimate
     this.preview.update(this.configPanel.getConfig());
+    this._updateEstimate();
+  }
+
+  _updateEstimate() {
+    if (this.configPanel.validate()) {
+      this.configPanel.updateEstimate(
+        VideoGenerator.estimate(this.configPanel.getConfig())
+      );
+    } else {
+      this.configPanel.clearEstimate();
+    }
   }
 
   async _handleGenerate() {
@@ -58,7 +75,11 @@ class App {
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      alert('Error generating video: ' + error.message);
+      // Cancel returns to idle silently; real failures keep the config and
+      // offer a retry through the error panel (no alert popup).
+      if (!error || error.code !== 'CANCELLED') {
+        this.configPanel.showError('Error generating video: ' + (error && error.message ? error.message : error));
+      }
     } finally {
       this.configPanel.hideProgress();
       this.configPanel.clearStatus();

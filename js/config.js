@@ -2,6 +2,7 @@ class ConfigPanel {
   constructor(container) {
     this.container = container;
     this.generateCallback = null;
+    this.cancelCallback = null;
     this._render();
   }
 
@@ -80,16 +81,21 @@ class ConfigPanel {
         </select>
 
         <button id="generateBtn">Generate Video</button>
-        <div id="statusMsg" style="min-height:20px;margin-top:6px;"></div>
+        <button id="cancelBtn" style="display:none;">Cancel</button>
+        <div id="estimate" style="min-height:20px;margin-top:6px;"></div>
+        <div id="statusMsg" aria-live="polite" style="min-height:20px;margin-top:6px;"></div>
         <div id="progressBar" style="display:none;">
           <div id="progressFill"></div>
         </div>
-        <div id="errorMsg" style="color:red;"></div>
+        <div id="errorMsg" role="alert" style="color:#ff6b6b;"></div>
       </div>
     `;
 
     this.container.querySelector('#generateBtn').addEventListener('click', () => {
       if (this.generateCallback) this.generateCallback();
+    });
+    this.container.querySelector('#cancelBtn').addEventListener('click', () => {
+      if (this.cancelCallback) this.cancelCallback();
     });
   }
 
@@ -142,6 +148,33 @@ class ConfigPanel {
     this.generateCallback = callback;
   }
 
+  onCancel(callback) {
+    this.cancelCallback = callback;
+  }
+
+  showError(message) {
+    const box = this.container.querySelector('#errorMsg');
+    box.innerHTML = '<span class="error-text"></span> <button type="button" id="retryBtn">Try again</button>';
+    box.querySelector('.error-text').textContent = message;
+    box.querySelector('#retryBtn').addEventListener('click', () => {
+      this.hideError();
+      if (this.generateCallback) this.generateCallback();
+    });
+  }
+
+  hideError() {
+    this.container.querySelector('#errorMsg').innerHTML = '';
+  }
+
+  updateEstimate(est) {
+    this.container.querySelector('#estimate').textContent =
+      `${est.frames} frames · ${est.seconds}s video · ${est.chunks} segment(s)`;
+  }
+
+  clearEstimate() {
+    this.container.querySelector('#estimate').textContent = '';
+  }
+
   setStatus(text) {
     this.container.querySelector('#statusMsg').textContent = text;
   }
@@ -152,6 +185,7 @@ class ConfigPanel {
 
   setGenerating(busy) {
     this.container.querySelector('#generateBtn').disabled = !!busy;
+    this.container.querySelector('#cancelBtn').style.display = busy ? 'block' : 'none';
   }
 
   showProgress(percent) {

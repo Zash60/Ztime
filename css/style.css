@@ -150,6 +150,30 @@ h1::after {
   transform: none;
 }
 
+#cancelBtn {
+  background: transparent;
+  border: 1px solid #e94560;
+  margin-top: 10px;
+}
+
+#estimate,
+#statusMsg {
+  font-size: 14px;
+  color: #eee;
+  opacity: 0.85;
+}
+
+#retryBtn {
+  margin-left: 8px;
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid #ff6b6b;
+  border-radius: 4px;
+  color: #ff6b6b;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .config-panel button:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;

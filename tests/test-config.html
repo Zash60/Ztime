@@ -7,7 +7,10 @@
 // Test: ConfigPanel class exists
 console.assert(typeof ConfigPanel === 'function', 'ConfigPanel must be a function');
 // Test: getConfig() returns object
-const mockContainer = { innerHTML: '', querySelector: () => ({ value: '60', addEventListener: () => {} }) };
+const mockContainer = { innerHTML: '', querySelector: (sel) => {
+  if (sel === '#generateBtn' || sel === '#cancelBtn') return { value: '60', style: {}, disabled: false, addEventListener: () => {} };
+  return { value: '60' };
+} };
 const panel = new ConfigPanel(mockContainer);
 console.assert(typeof panel.getConfig === 'function', 'getConfig must be a function');
 console.assert(typeof panel.validate === 'function', 'validate must be a function');

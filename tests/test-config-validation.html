@@ -24,7 +24,7 @@ function makePanel(values) {
     innerHTML: '',
     _errorEl: errorEl,
     querySelector: (sel) => {
-      if (sel === '#generateBtn') return { addEventListener: () => {} };
+      if (sel === '#generateBtn' || sel === '#cancelBtn') return { addEventListener: () => {} };
       if (sel === '#errorMsg') return errorEl;
       return { value: values[sel] };
     },
