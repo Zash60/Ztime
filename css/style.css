@@ -1,0 +1,101 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #1a1a2e;
+  color: #eee;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+#app {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#configContainer {
+  flex: 1;
+  background: #16213e;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+#previewContainer {
+  flex: 1;
+  background: #16213e;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.config-panel label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.config-panel input,
+.config-panel select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #0f3460;
+  border-radius: 4px;
+  background: #1a1a2e;
+  color: #eee;
+}
+
+.config-panel button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.config-panel button:hover {
+  background: #ff6b6b;
+}
+
+#progressBar {
+  margin-top: 10px;
+  height: 20px;
+  background: #0f3460;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#progressFill {
+  height: 100%;
+  background: #e94560;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+#errorMsg {
+  margin-top: 10px;
+  min-height: 20px;
+}
+
+#previewContainer canvas {
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid #0f3460;
+}
