@@ -19,4 +19,5 @@ Task 1: complete (commits 311d584..f6a7b7d, tests: node tests/run-test.js tests/
 Task 2: complete (commits f6a7b7d..75ded5d, tests: node tests/run-test.js tests/test-timer.html → 12/12 pass)
 Task 3: complete (commits 75ded5d..1ebce9c, tests: node tests/run-test.js tests/test-generator.html → 2/2 pass)
 Task 4: complete (commits 1ebce9c..8fe16fb, tests: node tests/run-test.js tests/test-config.html → 4/4 pass)
+Task 5: complete (commits 8fe16fb..2e70d96, tests: node tests/run-test.js tests/test-preview.html → 3/3 pass)
 
