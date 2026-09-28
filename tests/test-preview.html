@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head><title>Preview Test</title></head>
+<body>
+<script src="../js/timer.js"></script>
+<script src="../js/preview.js"></script>
+<script>
+// Mock document for Node.js
+document = {
+  createElement: (tag) => ({
+    width: 0,
+    height: 0,
+    getContext: () => ({
+      clearRect: () => {},
+      fillRect: () => {},
+      fillText: () => {},
+      set fillStyle(v) {},
+      set font(v) {},
+      set textAlign(v) {},
+      set textBaseline(v) {},
+    }),
+  }),
+};
+
+// Test: Preview class exists
+console.assert(typeof Preview === 'function', 'Preview must be a function');
+// Test: update() and getCanvas() exist
+const mockContainer = { appendChild: () => {} };
+const preview = new Preview(mockContainer);
+console.assert(typeof preview.update === 'function', 'update must be a function');
+console.assert(typeof preview.getCanvas === 'function', 'getCanvas must be a function');
+
+console.log('All Preview tests passed');
+</script>
+</body>
+</html>

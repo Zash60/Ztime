@@ -46,7 +46,7 @@ const mockConsole = {
 };
 
 // Create a shared context
-const context = vm.createContext({ console: mockConsole });
+const context = vm.createContext({ console: mockConsole, global: {} });
 
 // Load external scripts first
 for (const src of externalScripts) {
