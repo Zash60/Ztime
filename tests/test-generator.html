@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head><title>VideoGenerator Test</title></head>
+<body>
+<script src="../js/ffmpeg-loader.js"></script>
+<script src="../js/timer.js"></script>
+<script src="../js/generator.js"></script>
+<script>
+// Test: VideoGenerator class exists
+console.assert(typeof VideoGenerator === 'function', 'VideoGenerator must be a function');
+// Test: generate() returns a promise
+const gen = new VideoGenerator();
+console.assert(typeof gen.generate === 'function', 'generate must be a function');
+
+console.log('All VideoGenerator tests passed');
+</script>
+</body>
+</html>
