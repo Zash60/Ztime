@@ -1,6 +1,0 @@
-[     413ms] [LOG] All app no-container tests passed @ http://127.0.0.1:8899/tests/test-app-no-container.html:24
-[     476ms] TypeError: Cannot set properties of null (setting 'innerHTML')
-    at ConfigPanel._render (http://127.0.0.1:8899/js/config.js:24:30)
-    at new ConfigPanel (http://127.0.0.1:8899/js/config.js:5:10)
-    at App.init (http://127.0.0.1:8899/js/app.js:13:24)
-    at HTMLDocument.<anonymous> (http://127.0.0.1:8899/js/app.js:63:9)

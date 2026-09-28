@@ -1,1 +1,0 @@
-[    3237ms] [ASSERT] load() rejected: SharedArrayBuffer is not defined @ http://127.0.0.1:8899/tests/test-loader-script.html:19
