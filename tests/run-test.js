@@ -70,5 +70,9 @@ for (const script of scripts) {
   }
 }
 
-console.log(`\nResults: ${passed} passed, ${failed} failed`);
-process.exit(failed > 0 ? 1 : 0);
+// Allow async test assertions (promise callbacks) to run before reporting.
+// Bounded wait so a hanging async op cannot stall the runner forever.
+setTimeout(() => {
+  console.log(`\nResults: ${passed} passed, ${failed} failed`);
+  process.exit(failed > 0 ? 1 : 0);
+}, 1500);

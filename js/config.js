@@ -5,6 +5,21 @@ class ConfigPanel {
     this._render();
   }
 
+  // Parse "MM:SS.mmm" → milliseconds. Returns NaN for malformed input, never throws.
+  static parseTime(str) {
+    if (typeof str !== 'string') return NaN;
+    const parts = str.split(':');
+    if (parts.length !== 2) return NaN;
+    const minutes = Number(parts[0]);
+    const secParts = parts[1].split('.');
+    if (secParts.length > 2) return NaN;
+    const seconds = Number(secParts[0]);
+    const ms = secParts.length === 2 ? Number(secParts[1].padEnd(3, '0').slice(0, 3)) : 0;
+    if (!Number.isFinite(minutes) || !Number.isFinite(seconds) || !Number.isFinite(ms)) return NaN;
+    if (minutes < 0 || seconds < 0 || ms < 0) return NaN;
+    return (minutes * 60 + seconds) * 1000 + ms;
+  }
+
   _render() {
     this.container.innerHTML = `
       <div class="config-panel">
@@ -25,7 +40,7 @@ class ConfigPanel {
 
         <label>Background:</label>
         <select id="background">
-          <option value="transparent">Transparent</option>
+          <option value="transparent">Transparent (exports as black in MP4)</option>
           <option value="#000000">Black</option>
           <option value="#ffffff">White</option>
           <option value="#ff0000">Red</option>
@@ -69,23 +84,17 @@ class ConfigPanel {
 
   getConfig() {
     const [width, height] = this.container.querySelector('#resolution').value.split('x').map(Number);
-    const finalTimeStr = this.container.querySelector('#finalTime').value;
-    const parts = finalTimeStr.split(':');
-    const minutes = parseInt(parts[0], 10);
-    const secondsParts = parts[1].split('.');
-    const seconds = parseInt(secondsParts[0], 10);
-    const ms = parseInt((secondsParts[1] || '0').padEnd(3, '0').slice(0, 3), 10);
-    const finalTimeMs = (minutes * 60 + seconds) * 1000 + ms;
+    const finalTimeMs = ConfigPanel.parseTime(this.container.querySelector('#finalTime').value);
 
     return {
-      fps: parseInt(this.container.querySelector('#fps').value, 10),
+      fps: parseFloat(this.container.querySelector('#fps').value),
       finalTimeMs,
       width,
       height,
       background: this.container.querySelector('#background').value,
       font: {
         family: this.container.querySelector('#fontFamily').value,
-        size: parseInt(this.container.querySelector('#fontSize').value, 10),
+        size: parseFloat(this.container.querySelector('#fontSize').value),
         color: this.container.querySelector('#fontColor').value,
       },
       format: this.container.querySelector('#timeFormat').value,
@@ -96,14 +105,17 @@ class ConfigPanel {
     const config = this.getConfig();
     const errors = [];
 
-    if (config.fps < 1 || config.fps > 240) {
-      errors.push('FPS must be between 1 and 240');
+    if (!Number.isFinite(config.fps) || config.fps < 1 || config.fps > 240) {
+      errors.push('FPS must be a number between 1 and 240');
     }
-    if (config.finalTimeMs <= 0) {
-      errors.push('Final time must be greater than 0');
+    if (!Number.isFinite(config.finalTimeMs) || config.finalTimeMs <= 0) {
+      errors.push('Final time must be valid (MM:SS.mmm) and greater than 0');
     }
-    if (config.width <= 0 || config.height <= 0) {
+    if (!Number.isFinite(config.width) || !Number.isFinite(config.height) || config.width <= 0 || config.height <= 0) {
       errors.push('Resolution must be positive');
+    }
+    if (!Number.isFinite(config.font.size) || config.font.size <= 0) {
+      errors.push('Font size must be a positive number');
     }
 
     const errorMsg = this.container.querySelector('#errorMsg');

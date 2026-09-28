@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><title>FFmpegLoader Concurrency Test</title></head>
+<body>
+<script src="../js/ffmpeg-loader.js"></script>
+<script>
+// Concurrent load() calls must return the same in-flight promise (never undefined)
+const loader = new FFmpegLoader();
+const p1 = loader.load();
+const p2 = loader.load();
+console.assert(p1 instanceof Promise, 'first load() must return a promise');
+console.assert(p2 === p1, 'concurrent load() must return the same in-flight promise');
+
+// Failed loads must not wedge the loader: after rejection, loading resets so retry is possible
+p1.catch(() => {}).finally(() => {
+  console.assert(loader.isLoaded() === false, 'failed load must leave isLoaded() false');
+  console.assert(loader.loading === false, 'failed load must reset loading flag for retry');
+  const p3 = loader.load();
+  console.assert(p3 instanceof Promise, 'retry after failure must return a new promise');
+  p3.catch(() => {});
+  console.log('All FFmpegLoader concurrency tests passed');
+});
+</script>
+</body>
+</html>

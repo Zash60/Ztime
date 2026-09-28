@@ -3,17 +3,34 @@ class FFmpegLoader {
     this.ffmpeg = null;
     this.loading = false;
     this.progress = 0;
+    this._loadingPromise = null;
   }
 
-  async load() {
-    if (this.ffmpeg) return this.ffmpeg;
+  load() {
+    if (this.ffmpeg) return Promise.resolve(this.ffmpeg);
     if (this.loading) return this._loadingPromise;
 
     this.loading = true;
     this.progress = 0;
 
+    this._loadingPromise = this._doLoad().then(
+      (ffmpeg) => {
+        this.loading = false;
+        return ffmpeg;
+      },
+      (err) => {
+        // Never wedge: a failed load resets state so the next call retries.
+        this.loading = false;
+        this._loadingPromise = null;
+        throw err;
+      }
+    );
+    return this._loadingPromise;
+  }
+
+  async _doLoad() {
     // Load ffmpeg.wasm from CDN
-    const { createFFmpeg, fetchFile } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
+    const { createFFmpeg } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
 
     this.ffmpeg = createFFmpeg({
       log: false,
@@ -23,7 +40,6 @@ class FFmpegLoader {
     });
 
     await this.ffmpeg.load();
-    this.loading = false;
     return this.ffmpeg;
   }
 

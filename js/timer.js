@@ -1,6 +1,10 @@
 class TimerDisplay {
   static roundMs(timeMs, fps) {
-    return Math.round(timeMs);
+    // Snap to the nearest frame gridline for this fps, then round to
+    // whole milliseconds for display (60fps frames show 000, 017, 033…).
+    const frameDuration = 1000 / fps;
+    const gridTime = Math.round(timeMs / frameDuration) * frameDuration;
+    return Math.round(gridTime);
   }
 
   static formatTime(timeMs, fps, format = 'mmm') {

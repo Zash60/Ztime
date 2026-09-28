@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head><title>Transparent Background Test</title></head>
+<body>
+<script src="../js/ffmpeg-loader.js"></script>
+<script src="../js/timer.js"></script>
+<script src="../js/generator.js"></script>
+<script>
+// H.264/yuv420p has no alpha channel, so "transparent" must resolve to an
+// explicit opaque fallback at encode time — never silently.
+console.assert(VideoGenerator.effectiveBackground('transparent') === '#000000', "transparent must resolve to '#000000' for MP4 encode");
+console.assert(VideoGenerator.effectiveBackground('#ff0000') === '#ff0000', 'solid colors must pass through unchanged');
+console.assert(VideoGenerator.effectiveBackground('#ffffff') === '#ffffff', 'white must pass through unchanged');
+
+console.log('All transparent background tests passed');
+</script>
+</body>
+</html>

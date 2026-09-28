@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head><title>Config Validation Test</title></head>
+<body>
+<script src="../js/config.js"></script>
+<script>
+// Pure time parsing: valid strings → ms, malformed → NaN, never throws
+console.assert(ConfigPanel.parseTime('01:00.000') === 60000, "parseTime('01:00.000') should be 60000");
+console.assert(ConfigPanel.parseTime('0:00.017') === 17, "parseTime('0:00.017') should be 17");
+console.assert(Number.isNaN(ConfigPanel.parseTime('abc')), "parseTime('abc') should be NaN");
+console.assert(Number.isNaN(ConfigPanel.parseTime('12')), "parseTime('12') should be NaN");
+console.assert(Number.isNaN(ConfigPanel.parseTime('')), "parseTime('') should be NaN");
+console.assert(Number.isNaN(ConfigPanel.parseTime('01:xx.000')), "parseTime('01:xx.000') should be NaN");
+
+// Mock container factory
+function makePanel(values) {
+  const errorEl = { textContent: '' };
+  const container = {
+    innerHTML: '',
+    _errorEl: errorEl,
+    querySelector: (sel) => {
+      if (sel === '#generateBtn') return { addEventListener: () => {} };
+      if (sel === '#errorMsg') return errorEl;
+      return { value: values[sel] };
+    },
+    addEventListener: () => {},
+  };
+  return new ConfigPanel(container);
+}
+
+const good = {
+  '#fps': '60', '#finalTime': '01:00.000', '#resolution': '1920x1080',
+  '#background': '#000000', '#fontFamily': 'monospace', '#fontSize': '48',
+  '#fontColor': '#ffffff', '#timeFormat': 'mmm',
+};
+
+// Malformed time must fail validation, not throw
+let threw = false;
+let valid = false;
+try {
+  valid = makePanel(Object.assign({}, good, { '#finalTime': 'abc' })).validate();
+} catch (e) { threw = true; }
+console.assert(threw === false, 'malformed time must not throw');
+console.assert(valid === false, 'malformed time must fail validation');
+
+// Empty FPS (NaN) must fail validation
+console.assert(makePanel(Object.assign({}, good, { '#fps': '' })).validate() === false, 'empty FPS must fail validation');
+
+// Fractional FPS must be preserved and valid (user wants exact fps, e.g. 59.94)
+const frac = makePanel(Object.assign({}, good, { '#fps': '59.94' }));
+console.assert(frac.validate() === true, '59.94fps must validate');
+console.assert(frac.getConfig().fps === 59.94, '59.94fps must be preserved exactly, got ' + frac.getConfig().fps);
+
+// Out-of-range FPS still rejected
+console.assert(makePanel(Object.assign({}, good, { '#fps': '999' })).validate() === false, '999fps must fail validation');
+console.assert(makePanel(Object.assign({}, good, { '#fps': '0' })).validate() === false, '0fps must fail validation');
+
+console.log('All config validation tests passed');
+</script>
+</body>
+</html>
