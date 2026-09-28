@@ -34,4 +34,12 @@ Fix pass:
 - Fix 2 (Important #6): FFmpegLoader assigns _loadingPromise, resets loading on failure, drops unused fetchFile — test-loader-concurrency.html RED→GREEN (5/5)
 - Fix 3 (Critical #3 + Important #5/#7): ConfigPanel.parseTime (never throws, NaN on malformed), parseFloat FPS, Number.isFinite validation — test-config-validation.html RED→GREEN (13/13), test-config.html 4/4 still green
 - Fix 4 (Critical #1): VideoGenerator.effectiveBackground maps transparent→#000000 at encode, UI label states the MP4 limitation — test-transparent.html RED→GREEN (3/3)
+- Fix 5 (Critical #2 + Important #8): chunked encode (600-frame segments + concat, PNGs freed per chunk), frameTimes always ends at finalTimeMs, UI yields, encode-phase progress; also sliced Blob to view byte range — test-generator-chunks.html RED→GREEN (9/9)
+- Fix pass complete: full suite 80/80 green (commits 9b321b2..99d884b)
+
+## Deferred minors (reviewer Minor, not fixed per process)
+- Final: minor (deferred): URL.revokeObjectURL runs sync after a.click(); anchor never appended (Firefox) — js/app.js:45-50
+- Final: minor (deferred): generation failures use alert() instead of inline #errorMsg — js/app.js:52
+- Final: minor (deferred): CDN dependency without integrity pinning; vendor/ dir from spec never created
+- Final: minor (deferred): number inputs accept decimals/negatives/empty; set step=1 + integer checks — js/config.js
 
