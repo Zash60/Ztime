@@ -144,6 +144,12 @@ h1::after {
   transform: translateY(0);
 }
 
+.config-panel button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+  transform: none;
+}
+
 .config-panel button:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;

@@ -35,6 +35,8 @@ class App {
 
     const config = this.configPanel.getConfig();
     this.configPanel.showProgress(0);
+    this.configPanel.setGenerating(true);
+    this.configPanel.setStatus('Loading video engine…');
 
     try {
       if (!this.videoGenerator) {
@@ -43,6 +45,9 @@ class App {
 
       const blob = await this.videoGenerator.generate(config, (percent) => {
         this.configPanel.showProgress(percent);
+        this.configPanel.setStatus(
+          percent < 90 ? `Drawing frames… ${percent}%` : 'Encoding video…'
+        );
       });
 
       // Download video
@@ -56,6 +61,8 @@ class App {
       alert('Error generating video: ' + error.message);
     } finally {
       this.configPanel.hideProgress();
+      this.configPanel.clearStatus();
+      this.configPanel.setGenerating(false);
     }
   }
 }

@@ -12,6 +12,14 @@ const panel = new ConfigPanel(mockContainer);
 console.assert(typeof panel.getConfig === 'function', 'getConfig must be a function');
 console.assert(typeof panel.validate === 'function', 'validate must be a function');
 console.assert(typeof panel.onGenerate === 'function', 'onGenerate must be a function');
+// Phase status + in-progress button lock (user must see WHAT is happening)
+console.assert(typeof panel.setStatus === 'function', 'setStatus must be a function');
+console.assert(typeof panel.clearStatus === 'function', 'clearStatus must be a function');
+console.assert(typeof panel.setGenerating === 'function', 'setGenerating must be a function');
+panel.setStatus('Drawing frames…');
+panel.setGenerating(true);
+panel.setGenerating(false);
+panel.clearStatus();
 
 console.log('All ConfigPanel tests passed');
 </script>

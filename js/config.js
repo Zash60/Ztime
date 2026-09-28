@@ -70,6 +70,7 @@ class ConfigPanel {
         </select>
 
         <button id="generateBtn">Generate Video</button>
+        <div id="statusMsg" style="min-height:20px;margin-top:6px;"></div>
         <div id="progressBar" style="display:none;">
           <div id="progressFill"></div>
         </div>
@@ -129,6 +130,18 @@ class ConfigPanel {
 
   onGenerate(callback) {
     this.generateCallback = callback;
+  }
+
+  setStatus(text) {
+    this.container.querySelector('#statusMsg').textContent = text;
+  }
+
+  clearStatus() {
+    this.container.querySelector('#statusMsg').textContent = '';
+  }
+
+  setGenerating(busy) {
+    this.container.querySelector('#generateBtn').disabled = !!busy;
   }
 
   showProgress(percent) {
