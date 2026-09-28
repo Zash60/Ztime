@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>ConfigPanel Test</title></head>
+<body>
+<script src="../js/config.js"></script>
+<script>
+// Test: ConfigPanel class exists
+console.assert(typeof ConfigPanel === 'function', 'ConfigPanel must be a function');
+// Test: getConfig() returns object
+const mockContainer = { innerHTML: '', querySelector: () => ({ value: '60', addEventListener: () => {} }) };
+const panel = new ConfigPanel(mockContainer);
+console.assert(typeof panel.getConfig === 'function', 'getConfig must be a function');
+console.assert(typeof panel.validate === 'function', 'validate must be a function');
+console.assert(typeof panel.onGenerate === 'function', 'onGenerate must be a function');
+
+console.log('All ConfigPanel tests passed');
+</script>
+</body>
+</html>

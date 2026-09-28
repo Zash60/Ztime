@@ -17,4 +17,5 @@
 
 Task 1: complete (commits 311d584..f6a7b7d, tests: node tests/run-test.js tests/test-ffmpeg-loader.html → 4/4 pass)
 Task 2: complete (commits f6a7b7d..75ded5d, tests: node tests/run-test.js tests/test-timer.html → 12/12 pass)
+Task 3: complete (commits 75ded5d..1ebce9c, tests: node tests/run-test.js tests/test-generator.html → 2/2 pass)
 
