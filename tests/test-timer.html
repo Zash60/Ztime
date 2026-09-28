@@ -24,6 +24,22 @@ console.assert(TimerDisplay.roundMs(16.6667, 60) === 17, '16.6667ms at 60fps sho
 console.assert(TimerDisplay.roundMs(33.3333, 60) === 33, '33.3333ms at 60fps should round to 33');
 console.assert(TimerDisplay.roundMs(50, 60) === 50, '50ms at 60fps should round to 50');
 
+// Test: formatTime with hours
+console.assert(TimerDisplay.formatTime(3600000, 60, 'hmmm') === '1:00:00.000', '3600000ms hmmm should be 1:00:00.000');
+console.assert(TimerDisplay.formatTime(3661234, 60, 'hcc') === '1:01:01.23', '3661234ms hcc should be 1:01:01.23');
+console.assert(TimerDisplay.formatTime(3661234, 60, 'hd') === '1:01:01.2', '3661234ms hd should be 1:01:01.2');
+console.assert(TimerDisplay.formatTime(3723000, 30, 'hmmm') === '1:02:03.000', '3723000ms hmmm should be 1:02:03.000');
+
+// Test: formatTime without fraction
+console.assert(TimerDisplay.formatTime(65000, 60, 's') === '1:05', '65000ms s should be 1:05');
+console.assert(TimerDisplay.formatTime(3723000, 30, 'hs') === '1:02:03', '3723000ms hs should be 1:02:03');
+
+// Test: formatTime in total seconds (frame 5414 @60fps = 90233.33ms)
+console.assert(TimerDisplay.formatTime(90233.33333333333, 60, 'ssmmm') === '90.233', 'ssmmm should be 90.233');
+console.assert(TimerDisplay.formatTime(90233.33333333333, 60, 'sscc') === '90.23', 'sscc should be 90.23');
+console.assert(TimerDisplay.formatTime(90233.33333333333, 60, 'ssd') === '90.2', 'ssd should be 90.2');
+console.assert(TimerDisplay.formatTime(90000, 60, 'ssmmm') === '90.000', '90000ms ssmmm should be 90.000');
+
 console.log('All TimerDisplay tests passed');
 </script>
 </body>

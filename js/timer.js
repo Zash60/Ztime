@@ -10,23 +10,34 @@ class TimerDisplay {
   static formatTime(timeMs, fps, format = 'mmm') {
     const roundedMs = this.roundMs(timeMs, fps);
     const totalSeconds = Math.floor(roundedMs / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
     const ms = Math.floor(roundedMs % 1000);
 
+    const mm = String(minutes).padStart(2, '0');
     const ss = String(seconds).padStart(2, '0');
 
-    if (format === 'mmm') {
-      const mmm = String(ms).padStart(3, '0');
-      return `${minutes}:${ss}.${mmm}`;
-    } else if (format === 'cc') {
-      const cc = String(Math.floor(ms / 10)).padStart(2, '0');
-      return `${minutes}:${ss}.${cc}`;
-    } else if (format === 'd') {
-      const d = String(Math.floor(ms / 100));
-      return `${minutes}:${ss}.${d}`;
+    const fraction = (digits) => {
+      if (digits === 2) return String(Math.floor(ms / 10)).padStart(2, '0');
+      if (digits === 1) return String(Math.floor(ms / 100));
+      return String(ms).padStart(3, '0');
+    };
+
+    switch (format) {
+      case 'hmmm': return `${hours}:${mm}:${ss}.${fraction(3)}`;
+      case 'hcc': return `${hours}:${mm}:${ss}.${fraction(2)}`;
+      case 'hd': return `${hours}:${mm}:${ss}.${fraction(1)}`;
+      case 'hs': return `${hours}:${mm}:${ss}`;
+      case 'ssmmm': return `${totalSeconds}.${fraction(3)}`;
+      case 'sscc': return `${totalSeconds}.${fraction(2)}`;
+      case 'ssd': return `${totalSeconds}.${fraction(1)}`;
+      case 's': return `${Math.floor(totalSeconds / 60)}:${ss}`;
+      case 'cc': return `${Math.floor(totalSeconds / 60)}:${ss}.${fraction(2)}`;
+      case 'd': return `${Math.floor(totalSeconds / 60)}:${ss}.${fraction(1)}`;
+      case 'mmm':
+      default: return `${Math.floor(totalSeconds / 60)}:${ss}.${fraction(3)}`;
     }
-    return `${minutes}:${ss}.${String(ms).padStart(3, '0')}`;
   }
 
   static draw(canvas, timeMs, fps, options) {

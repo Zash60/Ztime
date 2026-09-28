@@ -5,19 +5,21 @@ class ConfigPanel {
     this._render();
   }
 
-  // Parse "MM:SS.mmm" → milliseconds. Returns NaN for malformed input, never throws.
+  // Parse "MM:SS.mmm" or "HH:MM:SS.mmm" → milliseconds.
+  // Returns NaN for malformed input, never throws.
   static parseTime(str) {
     if (typeof str !== 'string') return NaN;
     const parts = str.split(':');
-    if (parts.length !== 2) return NaN;
-    const minutes = Number(parts[0]);
-    const secParts = parts[1].split('.');
+    if (parts.length !== 2 && parts.length !== 3) return NaN;
+    const secParts = parts[parts.length - 1].split('.');
     if (secParts.length > 2) return NaN;
     const seconds = Number(secParts[0]);
     const ms = secParts.length === 2 ? Number(secParts[1].padEnd(3, '0').slice(0, 3)) : 0;
-    if (!Number.isFinite(minutes) || !Number.isFinite(seconds) || !Number.isFinite(ms)) return NaN;
-    if (minutes < 0 || seconds < 0 || ms < 0) return NaN;
-    return (minutes * 60 + seconds) * 1000 + ms;
+    const minutes = Number(parts[parts.length - 2]);
+    const hours = parts.length === 3 ? Number(parts[0]) : 0;
+    if (!Number.isFinite(hours) || !Number.isFinite(minutes) || !Number.isFinite(seconds) || !Number.isFinite(ms)) return NaN;
+    if (hours < 0 || minutes < 0 || seconds < 0 || ms < 0) return NaN;
+    return ((hours * 60 + minutes) * 60 + seconds) * 1000 + ms;
   }
 
   _render() {
@@ -28,7 +30,7 @@ class ConfigPanel {
         <label>FPS (1-240):</label>
         <input type="number" id="fps" value="60" min="1" max="240">
 
-        <label>Final Time (MM:SS.mmm):</label>
+        <label>Final Time (MM:SS.mmm or HH:MM:SS.mmm):</label>
         <input type="text" id="finalTime" value="01:00.000" placeholder="01:00.000">
 
         <label>Resolution:</label>
@@ -67,6 +69,14 @@ class ConfigPanel {
           <option value="mmm" selected>M:SS.mmm</option>
           <option value="cc">M:SS.cc</option>
           <option value="d">M:SS.d</option>
+          <option value="s">M:SS</option>
+          <option value="hmmm">H:MM:SS.mmm</option>
+          <option value="hcc">H:MM:SS.cc</option>
+          <option value="hd">H:MM:SS.d</option>
+          <option value="hs">H:MM:SS</option>
+          <option value="ssmmm">SS.mmm</option>
+          <option value="sscc">SS.cc</option>
+          <option value="ssd">SS.d</option>
         </select>
 
         <button id="generateBtn">Generate Video</button>

@@ -11,6 +11,11 @@ console.assert(Number.isNaN(ConfigPanel.parseTime('abc')), "parseTime('abc') sho
 console.assert(Number.isNaN(ConfigPanel.parseTime('12')), "parseTime('12') should be NaN");
 console.assert(Number.isNaN(ConfigPanel.parseTime('')), "parseTime('') should be NaN");
 console.assert(Number.isNaN(ConfigPanel.parseTime('01:xx.000')), "parseTime('01:xx.000') should be NaN");
+// Times with hours
+console.assert(ConfigPanel.parseTime('1:02:03.456') === 3723456, "parseTime('1:02:03.456') should be 3723456");
+console.assert(ConfigPanel.parseTime('01:00:00.000') === 3600000, "parseTime('01:00:00.000') should be 3600000");
+console.assert(ConfigPanel.parseTime('2:00:00') === 7200000, "parseTime('2:00:00') should be 7200000");
+console.assert(Number.isNaN(ConfigPanel.parseTime('1:02:03:04')), "parseTime with 4 parts should be NaN");
 
 // Mock container factory
 function makePanel(values) {
