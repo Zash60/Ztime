@@ -1,0 +1,37 @@
+- generic [ref=f21e1]:
+  - heading "Speedrun Timer Generator" [level=1] [ref=f21e2]
+  - generic [ref=f21e5]:
+    - heading "Timer Configuration" [level=2] [ref=f21e6]
+    - generic [ref=f21e7]: "FPS (1-240):"
+    - spinbutton [ref=f21e8]: "10"
+    - generic [ref=f21e9]: "Final Time (MM:SS.mmm):"
+    - textbox "01:00.000" [ref=f21e10]: 00:01.000
+    - generic [ref=f21e11]: "Resolution:"
+    - combobox [ref=f21e12]:
+      - option "1280x720 (HD)"
+      - option "1920x1080 (Full HD)" [selected]
+      - option "3840x2160 (4K)"
+    - generic [ref=f21e13]: "Background:"
+    - combobox [ref=f21e14]:
+      - option "Transparent (exports as black in MP4)"
+      - option "Black" [selected]
+      - option "White"
+      - option "Red"
+      - option "Green"
+      - option "Blue"
+    - generic [ref=f21e15]: "Font Family:"
+    - combobox [ref=f21e16]:
+      - option "Monospace" [selected]
+      - option "Arial"
+      - option "Helvetica"
+      - option "Courier New"
+    - generic [ref=f21e17]: "Font Size (px):"
+    - spinbutton [ref=f21e18]: "48"
+    - generic [ref=f21e19]: "Font Color:"
+    - textbox [ref=f21e20]: "#ffffff"
+    - generic [ref=f21e21]: "Time Format:"
+    - combobox [ref=f21e22]:
+      - option "M:SS.mmm" [selected]
+      - option "M:SS.cc"
+      - option "M:SS.d"
+    - button "Generate Video" [active] [ref=f21e23] [cursor=pointer]

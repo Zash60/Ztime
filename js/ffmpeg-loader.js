@@ -29,10 +29,17 @@ class FFmpegLoader {
   }
 
   async _doLoad() {
-    // Load ffmpeg.wasm from CDN
-    const { createFFmpeg } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
+    // The ffmpeg.min.js distribution is UMD (no ESM named exports), so a
+    // dynamic import() of it can never provide createFFmpeg. Load it as a
+    // classic script and use the window.FFmpeg global instead.
+    await this._loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
 
-    this.ffmpeg = createFFmpeg({
+    const namespace = (typeof window !== 'undefined' && window.FFmpeg) || {};
+    if (typeof namespace.createFFmpeg !== 'function') {
+      throw new Error('ffmpeg library did not expose createFFmpeg');
+    }
+
+    this.ffmpeg = namespace.createFFmpeg({
       log: false,
       progress: ({ ratio }) => {
         this.progress = Math.round(ratio * 100);
@@ -41,6 +48,25 @@ class FFmpegLoader {
 
     await this.ffmpeg.load();
     return this.ffmpeg;
+  }
+
+  _loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const doc = (typeof document !== 'undefined') ? document : null;
+      if (!doc) {
+        reject(new Error('No document available to load ffmpeg'));
+        return;
+      }
+      if (doc.querySelector && doc.querySelector(`script[src="${src}"]`)) {
+        resolve();
+        return;
+      }
+      const el = doc.createElement('script');
+      el.onload = () => resolve();
+      el.onerror = () => reject(new Error('Failed to load ffmpeg script'));
+      el.src = src;
+      doc.head.appendChild(el);
+    });
   }
 
   isLoaded() {
