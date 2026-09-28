@@ -15,3 +15,5 @@
 
 ## Tasks
 
+Task 1: complete (commits 311d584..f6a7b7d, tests: node tests/run-test.js tests/test-ffmpeg-loader.html → 4/4 pass)
+
