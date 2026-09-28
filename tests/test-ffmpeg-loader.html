@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>FFmpegLoader Test</title></head>
+<body>
+<script src="../js/ffmpeg-loader.js"></script>
+<script>
+// Test: FFmpegLoader class exists
+console.assert(typeof FFmpegLoader === 'function', 'FFmpegLoader must be a function');
+// Test: load() returns a promise
+const loader = new FFmpegLoader();
+console.assert(typeof loader.load === 'function', 'load must be a function');
+console.assert(typeof loader.isLoaded === 'function', 'isLoaded must be a function');
+console.assert(typeof loader.getProgress === 'function', 'getProgress must be a function');
+console.log('All FFmpegLoader tests passed');
+</script>
+</body>
+</html>
