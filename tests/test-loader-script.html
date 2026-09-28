@@ -8,17 +8,30 @@
 // Regression test: FFmpegLoader.load() must actually resolve an ffmpeg
 // instance (the UMD build has no ESM named exports, so a dynamic import()
 // of it can never provide createFFmpeg — this caught a real e2e failure).
+// On non-isolated pages (no COOP/COEP, SharedArrayBuffer unavailable) the
+// load must reject with the clear SAB guidance instead of a cryptic error.
 const loader = new FFmpegLoader();
-loader.load().then((ff) => {
-  console.assert(loader.isLoaded() === true, 'loader should report loaded');
-  console.assert(!!ff, 'load() should resolve an instance');
-  return loader.load().then((ff2) => {
-    console.assert(ff2 === ff, 'second load() should resolve the cached instance');
-    console.log('All loader script tests passed');
-  });
-}).catch((e) => {
-  console.assert(false, 'load() rejected: ' + (e && e.message));
-});
+loader.load().then(
+  (ff) => {
+    console.assert(loader.isLoaded() === true, 'loader should report loaded');
+    console.assert(!!ff, 'load() should resolve an instance');
+    return loader.load().then((ff2) => {
+      console.assert(ff2 === ff, 'second load() should resolve the cached instance');
+      console.log('All loader script tests passed');
+    });
+  },
+  (e) => {
+    if (typeof window !== 'undefined' && window.crossOriginIsolated === false) {
+      console.assert(
+        /SharedArrayBuffer/.test(e && e.message),
+        'non-isolated page must fail with SAB guidance, got: ' + (e && e.message)
+      );
+      console.log('All loader script tests passed (non-isolated page)');
+    } else {
+      console.assert(false, 'load() rejected: ' + (e && e.message));
+    }
+  }
+);
 </script>
 </body>
 </html>

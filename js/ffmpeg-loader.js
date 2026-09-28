@@ -29,6 +29,16 @@ class FFmpegLoader {
   }
 
   async _doLoad() {
+    // ffmpeg.wasm needs SharedArrayBuffer, which requires a cross-origin
+    // isolated page (COOP/COEP headers). Fail fast with a clear message
+    // instead of a cryptic error from inside the library.
+    if (typeof SharedArrayBuffer === 'undefined') {
+      throw new Error(
+        'Video encoding needs SharedArrayBuffer: serve this page with ' +
+        'Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers'
+      );
+    }
+
     // The ffmpeg.min.js distribution is UMD (no ESM named exports), so a
     // dynamic import() of it can never provide createFFmpeg. Load it as a
     // classic script and use the window.FFmpeg global instead.
