@@ -1,8 +1,24 @@
 class Preview {
   constructor(container) {
     this.container = container;
+    this.figure = document.createElement('figure');
     this.canvas = document.createElement('canvas');
-    this.container.appendChild(this.canvas);
+    this.caption = document.createElement('figcaption');
+    // DOM enhancements, guarded for unit-test stubs whose createElement
+    // returns a bare canvas mock (no setAttribute/appendChild/classList).
+    try {
+      if (this.figure && typeof this.figure.className !== 'undefined') this.figure.className = 'monitor';
+      if (this.canvas && typeof this.canvas.setAttribute === 'function') this.canvas.setAttribute('role', 'img');
+      if (this.caption && typeof this.caption.className !== 'undefined') this.caption.className = 'monitor-caption';
+      if (this.figure && typeof this.figure.appendChild === 'function') {
+        this.figure.appendChild(this.canvas);
+        this.figure.appendChild(this.caption);
+      }
+    } catch (_) { /* keep bare-canvas fallback */ }
+    try {
+      if (this.figure && typeof this.figure.appendChild === 'function') this.container.appendChild(this.figure);
+      else this.container.appendChild(this.canvas);
+    } catch (_) { /* test stubs */ }
   }
 
   update(config) {
@@ -11,10 +27,29 @@ class Preview {
     this.canvas.width = width;
     this.canvas.height = height;
 
+    // Output-monitor treatment: checkerboard signals transparency (which
+    // exports as black in MP4), and the caption names the real dimensions.
+    const transparent = background === 'transparent';
+    try {
+      if (this.figure && this.figure.classList && typeof this.figure.classList.toggle === 'function') {
+        this.figure.classList.toggle('is-transparent', transparent);
+      }
+    } catch (_) { /* test stubs */ }
+    const bgName = transparent ? 'transparent (exports as black)' : background;
+    try {
+      if (this.caption) this.caption.textContent = `${width}×${height} · ${bgName}`;
+    } catch (_) { /* test stubs */ }
+
     // Draw initial frame (time = 0) once the font is ready, so the preview
     // never shows a fallback-font flash.
     TimerDisplay.ensureFont(font).then(() => {
       TimerDisplay.draw(this.canvas, 0, fps, { background, font, format });
+      try {
+        if (this.canvas && typeof this.canvas.setAttribute === 'function') {
+          const label = TimerDisplay.formatTime(0, fps, format);
+          this.canvas.setAttribute('aria-label', `Timer preview showing ${label} at ${width} by ${height} pixels`);
+        }
+      } catch (_) { /* non-DOM test stubs */ }
     });
   }
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head><link rel="icon" href="data:,"><meta charset="utf-8"><title>UI Pass Test</title></head>
+<body>
+<script src="../js/timer.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/preview.js"></script>
+<script>
+// Minimal DOM stub: elements by #id with value/textContent/classList/attrs.
+function makeEl(id) {
+  const listeners = {};
+  return {
+    id, value: '60',
+    textContent: '', innerHTML: '',
+    style: {},
+    classList: { _s: new Set(), toggle(c, f) { f ? this._s.add(c) : this._s.delete(c); }, contains(c) { return this._s.has(c); } },
+    attrs: {},
+    setAttribute(k, v) { this.attrs[k] = v; },
+    removeAttribute(k) { delete this.attrs[k]; },
+    addEventListener(ev, cb) { listeners[ev] = cb; },
+  };
+}
+function makeContainer() {
+  const els = {};
+  ['generateBtn','cancelBtn','fps','finalTime','resolution','background','fontFamily','fontSize','fontColor','timeFormat','estimate','statusMsg','progressBar','progressFill','errorMsg','successMsg','formatExample','fpsError','finalTimeError','timeFormatError','fontSizeError'].forEach((id) => { els['#' + id] = makeEl(id); });
+  return {
+    innerHTML: '',
+    _els: els,
+    querySelector(sel) { return els[sel] || makeEl(sel); },
+    addEventListener() {},
+  };
+}
+const c = makeContainer();
+c._els['#finalTime'].value = '01:00.000';
+c._els['#fps'].value = '60';
+c._els['#timeFormat'].value = 'mmm';
+c._els['#resolution'].value = '1920x1080';
+c._els['#fontSize'].value = '48';
+const panel = new ConfigPanel(c);
+
+// 1. clarify: live format example reformats current final time
+console.assert(/1:00\.000/.test(c._els['#formatExample'].textContent), 'format example must render current time, got ' + c._els['#formatExample'].textContent);
+c._els['#timeFormat'].value = 'cc';
+panel.updateFormatExample();
+console.assert(/1:00\.00\b/.test(c._els['#formatExample'].textContent), 'format example must follow format change, got ' + c._els['#formatExample'].textContent);
+c._els['#timeFormat'].value = 'mmm';
+
+// 2. harden: labels are for/id associated in real markup
+console.assert(/for="finalTime"/.test(c.innerHTML) && /for="timeFormat"/.test(c.innerHTML), 'labels must use for/id association');
+
+// 3. harden: per-field inline errors + font-size bounds
+c._els['#fps'].value = '999';
+c._els['#fontSize'].value = '400';
+console.assert(panel.validate() === false, 'out-of-range fps/font must fail validation');
+console.assert(c._els['#fpsError'].textContent.length > 0, 'fps needs an inline error');
+console.assert(c._els['#fontSizeError'].textContent.length > 0, 'font size needs an inline error');
+console.assert(c._els['#fps'].attrs['aria-invalid'] === 'true', 'invalid input must get aria-invalid');
+c._els['#fps'].value = '60';
+c._els['#fontSize'].value = '48';
+console.assert(panel.validate() === true, 'valid config must pass');
+console.assert(c._els['#fpsError'].textContent === '', 'inline errors must clear on valid input');
+
+// 4. harden: huge-job cost warning in estimate
+panel.updateEstimate({ frames: 20000, seconds: 333 });
+console.assert(/big render/.test(c._els['#estimate'].textContent), 'huge jobs need a cost warning, got ' + c._els['#estimate'].textContent);
+console.assert(c._els['#estimate'].classList.contains('estimate-warning'), 'warning must carry the class');
+panel.updateEstimate({ frames: 60, seconds: 1 });
+console.assert(!/big render/.test(c._els['#estimate'].textContent), 'small jobs must not warn');
+
+// 5. polish: progressbar role + success confirmation API
+console.assert(/role="progressbar"/.test(c.innerHTML), 'progress bar must expose role=progressbar');
+panel.showSuccess('saved');
+console.assert(c._els['#successMsg'].textContent === 'saved', 'showSuccess must set the message');
+panel.clearSuccess();
+console.assert(c._els['#successMsg'].textContent === '', 'clearSuccess must clear');
+
+// 6. polish: preview monitor treatment (caption + img role + checkerboard class)
+document = {
+  createElement: (tag) => ({
+    tag, className: '', textContent: '',
+    children: [],
+    classList: { toggle() {} },
+    setAttribute() {},
+    appendChild(ch) { this.children.push(ch); },
+    width: 0, height: 0,
+    getContext: () => ({ clearRect() {}, fillRect() {}, fillText() {}, set fillStyle(v) {}, set font(v) {}, set textAlign(v) {}, set textBaseline(v) {} }),
+  }),
+};
+const pbox = { appendChild() {} };
+const preview = new Preview(pbox);
+preview.update({ fps: 60, width: 1280, height: 720, background: 'transparent', font: { family: 'monospace', size: 48, color: '#fff' }, format: 'mmm' });
+console.assert(/1280/.test(preview.caption.textContent) && /720/.test(preview.caption.textContent), 'caption must name dimensions, got ' + preview.caption.textContent);
+
+console.log('All UI pass tests passed');
+</script>
+</body>
+</html>

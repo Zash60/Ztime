@@ -102,8 +102,116 @@ h1::after {
   border-radius: 4px;
   background: #1a1a2e;
   color: #eee;
-  font-size: 0.95rem;
+  font-size: 16px;
   line-height: 1.4;
+}
+
+/* Grouped configuration: Timing / Output lead, Typography disclosed. */
+.cfg-group {
+  border: 1px solid #0f3460;
+  border-radius: 6px;
+  padding: 4px 14px 16px;
+  margin-top: 18px;
+  min-width: 0;
+}
+
+.cfg-group legend {
+  padding: 0 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.cfg-group label {
+  margin-top: 14px;
+}
+
+.cfg-details {
+  padding: 0 14px;
+}
+
+.cfg-details summary {
+  padding: 14px 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.cfg-details summary:focus-visible {
+  outline: 2px solid #e94560;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.cfg-details label:first-of-type {
+  margin-top: 2px;
+}
+
+.cfg-details[open] {
+  padding-bottom: 16px;
+}
+
+.hint {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(238, 238, 238, 0.72);
+}
+
+.hint-example {
+  color: rgba(238, 238, 238, 0.9);
+}
+
+.field-error {
+  margin-top: 6px;
+  min-height: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #ff8f8f;
+}
+
+.field-error:empty {
+  display: none;
+}
+
+.config-panel input[aria-invalid="true"],
+.config-panel select[aria-invalid="true"] {
+  border-color: #ff6b6b;
+}
+
+.format-example {
+  margin-top: 8px;
+  padding: 8px 12px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.9rem;
+  background: #1a1a2e;
+  border: 1px dashed #0f3460;
+  border-radius: 4px;
+  color: #fff;
+  overflow-wrap: break-word;
+}
+
+.format-example:empty {
+  display: none;
+}
+
+.estimate-warning {
+  color: #ffd166;
+}
+
+#successMsg {
+  font-size: 14px;
+  color: #7bed9f;
+}
+
+#successMsg:empty {
+  display: none;
 }
 
 .config-panel input:focus-visible,
@@ -209,6 +317,36 @@ h1::after {
   border: 2px solid #0f3460;
   border-radius: 4px;
   background: #1a1a2e;
+}
+
+/* Output-monitor treatment: the canvas is the screen, the caption names
+   the real export dimensions underneath it. */
+.monitor {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.monitor canvas {
+  display: block;
+}
+
+.monitor.is-transparent canvas {
+  background-image:
+    linear-gradient(45deg, #2a2a44 25%, transparent 25%, transparent 75%, #2a2a44 75%),
+    linear-gradient(45deg, #2a2a44 25%, transparent 25%, transparent 75%, #2a2a44 75%);
+  background-color: #1a1a2e;
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+.monitor-caption {
+  margin-top: 10px;
+  text-align: center;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  color: rgba(238, 238, 238, 0.72);
+  overflow-wrap: break-word;
 }
 
 :focus-visible {

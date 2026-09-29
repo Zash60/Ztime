@@ -29,7 +29,10 @@ class App {
         const config = this.configPanel.getConfig();
         this.preview.update(config);
         this.configPanel.hideError();
+        this.configPanel.updateFormatExample();
         this._updateEstimate();
+      } else {
+        this.configPanel.updateFormatExample();
       }
     };
     configContainer.addEventListener('input', refresh);
@@ -56,6 +59,7 @@ class App {
     const config = this.configPanel.getConfig();
     this.configPanel.showProgress(0);
     this.configPanel.setGenerating(true);
+    this.configPanel.clearSuccess();
     this.configPanel.setStatus('Loading video engine…');
 
     try {
@@ -81,6 +85,9 @@ class App {
       a.download = 'speedrun-timer.mp4';
       a.click();
       URL.revokeObjectURL(url);
+      this.configPanel.showSuccess(
+        `Run video saved — speedrun-timer.mp4 (${config.width}×${config.height}, ${config.fps} fps). Generate again to iterate on the split.`
+      );
     } catch (error) {
       // Cancel returns to idle silently; real failures keep the config and
       // offer a retry through the error panel (no alert popup).
