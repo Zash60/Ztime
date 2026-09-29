@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head><link rel="icon" href="data:,"><meta charset="utf-8"><title>WebCodecs Loader Test</title></head>
+<body>
+<script src="../js/timer.js"></script>
+<script src="../js/generator.js"></script>
+<script>
+// Test: loadMuxer resolves the five names and caches (one import for two calls)
+const realImport = VideoGenerator._importMuxer;
+let importCalls = 0;
+VideoGenerator._importMuxer = async () => {
+  importCalls++;
+  return { Output: 1, Mp4OutputFormat: 2, BufferTarget: 3, CanvasSource: 4, Quality: 5 };
+};
+VideoGenerator._muxerPromise = null;
+VideoGenerator.loadMuxer().then((m1) => {
+  console.assert(m1.CanvasSource === 4, 'loadMuxer must expose CanvasSource');
+  return VideoGenerator.loadMuxer();
+}).then((m2) => {
+  console.assert(m2.Output === 1, 'second loadMuxer must resolve cached module');
+  console.assert(importCalls === 1, 'module must be imported once, got ' + importCalls);
+  VideoGenerator._importMuxer = async () => ({ Output: 1 });
+  VideoGenerator._muxerPromise = null;
+  return VideoGenerator.loadMuxer().then(
+    () => console.assert(false, 'incomplete module must reject'),
+    (err) => console.assert(/vendor\/mediabunny/.test(err.message), 'error must name the vendored path, got ' + err.message)
+  );
+}).then(() => {
+  VideoGenerator._importMuxer = realImport;
+  VideoGenerator._muxerPromise = null;
+  console.log('All WebCodecs loader tests passed');
+});
+</script>
+</body>
+</html>

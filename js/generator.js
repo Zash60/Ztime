@@ -62,6 +62,26 @@ class VideoGenerator {
       return { ok: false, reason: 'H.264 support check failed: ' + (err && err.message ? err.message : err) };
     }
   }
+  // Mediabunny is vendored (no runtime CDN). The indirection through
+  // _importMuxer exists so tests can stub the module.
+  static _importMuxer() {
+    return import('/vendor/mediabunny/mediabunny.min.mjs');
+  }
+
+  // Loads (once, cached) and validates the muxer module.
+  static loadMuxer() {
+    if (!VideoGenerator._muxerPromise) {
+      VideoGenerator._muxerPromise = VideoGenerator._importMuxer().then((mod) => {
+        for (const name of ['Output', 'Mp4OutputFormat', 'BufferTarget', 'CanvasSource', 'Quality']) {
+          if (!mod || !mod[name]) {
+            throw new Error('Video encoding library failed to load (/vendor/mediabunny): missing ' + name);
+          }
+        }
+        return mod;
+      });
+    }
+    return VideoGenerator._muxerPromise;
+  }
   // Frame-count forecast for the estimate shown before generation starts.
   static estimate({ fps, finalTimeMs }) {
     const times = VideoGenerator.frameTimes(finalTimeMs, fps);
