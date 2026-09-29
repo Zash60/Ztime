@@ -8,8 +8,8 @@
   font-display: swap;
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
-  src: url('../fonts/ibm-plex-mono-400.woff2') format('woff2');
+  font-family: 'Share Tech Mono';
+  src: url('../fonts/share-tech-mono-400.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -22,8 +22,8 @@
   font-display: swap;
 }
 @font-face {
-  font-family: 'Roboto Mono';
-  src: url('../fonts/roboto-mono-400.woff2') format('woff2');
+  font-family: 'VT323';
+  src: url('../fonts/vt323-400.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;

@@ -27,7 +27,7 @@ panel.clearStatus();
 // Test: vendored font catalogue (single source of truth for the select)
 const families = ConfigPanel.getFontFamilies();
 console.assert(Array.isArray(families) && families.length === 7, 'must list 7 families, got ' + (families && families.length));
-const expectedFamilies = ['JetBrains Mono', 'IBM Plex Mono', 'Space Mono', 'Roboto Mono', 'Ubuntu Mono', 'Cascadia Code', 'monospace'];
+const expectedFamilies = ['JetBrains Mono', 'Space Mono', 'Share Tech Mono', 'Ubuntu Mono', 'Cascadia Code', 'VT323', 'monospace'];
 console.assert(JSON.stringify(families.map((f) => f.value)) === JSON.stringify(expectedFamilies), 'family values must match vendored @font-face names, got ' + JSON.stringify(families.map((f) => f.value)));
 console.assert(families.every((f) => typeof f.label === 'string' && f.label.length > 0), 'every family needs a label');
 

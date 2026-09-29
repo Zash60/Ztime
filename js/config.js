@@ -28,11 +28,11 @@ class ConfigPanel {
   static getFontFamilies() {
     return [
       { value: 'JetBrains Mono', label: 'JetBrains Mono' },
-      { value: 'IBM Plex Mono', label: 'IBM Plex Mono' },
       { value: 'Space Mono', label: 'Space Mono' },
-      { value: 'Roboto Mono', label: 'Roboto Mono' },
+      { value: 'Share Tech Mono', label: 'Share Tech Mono' },
       { value: 'Ubuntu Mono', label: 'Ubuntu Mono' },
       { value: 'Cascadia Code', label: 'Cascadia Code' },
+      { value: 'VT323', label: 'VT323' },
       { value: 'monospace', label: 'System monospace' },
     ];
   }
