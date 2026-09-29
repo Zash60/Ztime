@@ -28,6 +28,21 @@ VideoGenerator.loadMuxer().then((m1) => {
     (err) => console.assert(/vendor\/mediabunny/.test(err.message), 'error must name the vendored path, got ' + err.message)
   );
 }).then(() => {
+  // A failed load must not wedge retries: reject once, then resolve.
+  let attempts = 0;
+  VideoGenerator._importMuxer = async () => {
+    attempts++;
+    if (attempts === 1) throw new Error('flaky-network-test');
+    return { Output: 1, Mp4OutputFormat: 2, BufferTarget: 3, CanvasSource: 4, Quality: 5 };
+  };
+  VideoGenerator._muxerPromise = null;
+  return VideoGenerator.loadMuxer().then(
+    () => console.assert(false, 'first flaky load must reject'),
+    () => VideoGenerator.loadMuxer()
+  ).then((m) => {
+    console.assert(m.Quality === 5 && attempts === 2, 'retry after failure must re-import and resolve');
+  });
+}).then(() => {
   console.log('All WebCodecs loader tests passed');
   return runGenerateTests();
 }).then(() => {
@@ -87,6 +102,25 @@ function runGenerateTests() {
       (err) => {
         console.assert(/no-h264-test/.test(err.message), 'must reject with the gate reason, got ' + err.message);
         console.assert(imports === 0, 'must not import the muxer when unsupported');
+      }
+    );
+  }).then(() => {
+    // Non-cancel failures must also free the encoder.
+    const failCalls = { add: [] };
+    let adds = 0;
+    const failMod = fakeModule(failCalls);
+    const RealSource = failMod.CanvasSource;
+    failMod.CanvasSource = class extends RealSource {
+      add(t, d) { if (++adds === 2) throw new Error('encode-broke-test'); super.add(t, d); }
+    };
+    VideoGenerator._importMuxer = async () => failMod;
+    VideoGenerator._muxerPromise = null;
+    VideoGenerator.checkSupport = async () => ({ ok: true });
+    return new VideoGenerator().generate(cfg).then(
+      () => console.assert(false, 'encode failure must reject'),
+      (err) => {
+        console.assert(/encode-broke-test/.test(err.message), 'must surface the encoder error, got ' + err.message);
+        console.assert(failCalls.cancelled === true, 'failure must call output.cancel()');
       }
     );
   }).then(() => {

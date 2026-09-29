@@ -46,6 +46,8 @@ console.assert(VideoGenerator.shouldReport(23, 23.6) === true, 'changed rounded 
 // Test: bitrate scales with pixel count (~0.25 bits/pixel, integer)
 console.assert(VideoGenerator.bitrateFor(1920, 1080, 30) === Math.round(1920 * 1080 * 0.25), '1080p bitrate must be pixels*0.25');
 console.assert(VideoGenerator.bitrateFor(3840, 2160, 30) > VideoGenerator.bitrateFor(1920, 1080, 30), '4K bitrate must exceed 1080p');
+console.assert(VideoGenerator.bitrateFor(1920, 1080, 60) === 2 * VideoGenerator.bitrateFor(1920, 1080, 30), 'bitrate must scale with fps above 30');
+console.assert(VideoGenerator.bitrateFor(1920, 1080, 15) === VideoGenerator.bitrateFor(1920, 1080, 30), 'bitrate must not scale below 30fps');
 
 // Test: framePlan — exact per-frame timestamps in seconds, constant duration
 const plan60 = VideoGenerator.framePlan(60000, 60);

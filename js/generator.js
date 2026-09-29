@@ -17,10 +17,12 @@ class VideoGenerator {
     if (this.cancelled) throw VideoGenerator.cancelledError();
   }
 
-  // Target bitrate in bits/sec (~0.25 bits/pixel): visually lossless for
-  // flat timer graphics on hardware H.264, file size grows instead.
+  // Target bitrate in bits/sec (~0.25 bits/pixel at 30fps, scaled up with
+  // fps so per-frame quality holds at high frame rates; never scaled below
+  // the 30fps baseline). Visually lossless for flat timer graphics on
+  // hardware H.264; file size grows instead of quality dropping.
   static bitrateFor(width, height, fps) {
-    return Math.round(width * height * 0.25);
+    return Math.round(width * height * 0.25 * Math.max(1, fps / 30));
   }
 
   // Exact per-frame timestamps in seconds plus the constant frame duration.
@@ -68,17 +70,24 @@ class VideoGenerator {
     return import('/vendor/mediabunny/mediabunny.min.mjs');
   }
 
-  // Loads (once, cached) and validates the muxer module.
+  // Loads (once, cached) and validates the muxer module. A failed load
+  // resets the cache so the error panel's retry can try again (never wedged).
   static loadMuxer() {
     if (!VideoGenerator._muxerPromise) {
-      VideoGenerator._muxerPromise = VideoGenerator._importMuxer().then((mod) => {
-        for (const name of ['Output', 'Mp4OutputFormat', 'BufferTarget', 'CanvasSource', 'Quality']) {
-          if (!mod || !mod[name]) {
-            throw new Error('Video encoding library failed to load (/vendor/mediabunny): missing ' + name);
+      VideoGenerator._muxerPromise = VideoGenerator._importMuxer().then(
+        (mod) => {
+          for (const name of ['Output', 'Mp4OutputFormat', 'BufferTarget', 'CanvasSource', 'Quality']) {
+            if (!mod || !mod[name]) {
+              throw new Error('Video encoding library failed to load (/vendor/mediabunny): missing ' + name);
+            }
           }
+          return mod;
+        },
+        (err) => {
+          VideoGenerator._muxerPromise = null;
+          throw err;
         }
-        return mod;
-      });
+      );
     }
     return VideoGenerator._muxerPromise;
   }
@@ -204,10 +213,9 @@ class VideoGenerator {
 
       return new Blob([output.target.buffer], { type: 'video/mp4' });
     } catch (err) {
-      // On cancel, free the encoder resources and rethrow the CANCELLED error.
-      if (err && err.code === 'CANCELLED') {
-        try { await output.cancel(); } catch (_) { /* already gone */ }
-      }
+      // Free encoder resources on every failure path (cancel or error),
+      // then rethrow.
+      try { await output.cancel(); } catch (_) { /* already gone */ }
       throw err;
     }
   }

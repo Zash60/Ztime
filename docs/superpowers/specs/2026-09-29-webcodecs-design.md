@@ -38,8 +38,9 @@ duration / FPS, MP4 downloads, verified in a real browser.
 
 ## 3. Quality + frame accuracy
 
-- Bitrate generous, scaled by resolution (~0.25 bits/pixel: 1080p30 ≈
-  15 Mbps, 4K ≈ 60 Mbps). Flat timer graphics (solid background + text)
+- Bitrate generous, scaled by resolution (~0.25 bits/pixel at 30fps,
+  scaled up with fps so per-frame quality holds at high frame rates;
+  1080p30 ≈ 15 Mbps, 4K ≈ 60 Mbps). Flat timer graphics (solid background + text)
   are visually lossless at these rates on hardware H.264.
 - Frame accuracy holds by construction: pixels are rendered on the canvas
   with the unchanged `roundMs` / `frameTimes` logic before capture, so
