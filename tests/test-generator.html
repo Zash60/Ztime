@@ -27,11 +27,12 @@ function fakeCanvas() {
   };
   Object.defineProperty(ctx, 'font', { get() { return this._font; }, set(v) { calls.fontSets++; this._font = v; } });
   Object.defineProperty(ctx, 'textAlign', { get() { return this._align; }, set(v) { calls.alignSets++; this._align = v; } });
-  return { width: 640, height: 100, _calls: calls, getContext() { return ctx; } };
+  return { width: 640, height: 100, _calls: calls, _ctxOpts: null, getContext(type, opts) { this._ctxOpts = opts; return ctx; } };
 }
 const paintOpts = { background: '#000000', font: { family: 'monospace', size: 48, color: '#ffffff' }, format: 'mmm' };
 const c1 = fakeCanvas();
 const paint = TimerDisplay.createFramePainter(c1, paintOpts);
+console.assert(c1._ctxOpts && c1._ctxOpts.desynchronized !== true, 'painter must not use a desynchronized context (stale snapshots on mobile GPUs)');
 paint(0, 60); paint(16.666666666666668, 60); paint(33.333333333333336, 60);
 console.assert(c1._calls.fontSets === 1, 'painter must set font once for N frames, got ' + c1._calls.fontSets);
 console.assert(c1._calls.alignSets === 1, 'painter must set textAlign once for N frames, got ' + c1._calls.alignSets);

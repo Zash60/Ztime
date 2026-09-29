@@ -56,9 +56,12 @@ class TimerDisplay {
     const { width, height } = canvas;
     const { background, font, format } = options;
     const opaque = background !== 'transparent';
+    // NOTE: no `desynchronized: true` — desynchronized canvases let the
+    // GPU present a stale front buffer, and hardware encoders snapshot
+    // that stale image (frozen/shifted timer on mobile).
     let ctx;
     try {
-      ctx = canvas.getContext('2d', { alpha: !opaque, desynchronized: true });
+      ctx = canvas.getContext('2d', { alpha: !opaque });
     } catch (_) {
       ctx = canvas.getContext('2d');
     }
