@@ -52,7 +52,38 @@ console.assert(JSON.stringify(c1._calls.fillTexts) === JSON.stringify(c2._calls.
 console.assert(VideoGenerator.shouldReport(23, 23.2) === false, 'same rounded percent must not report');
 console.assert(VideoGenerator.shouldReport(23, 23.6) === true, 'changed rounded percent must report');
 
-console.log('All VideoGenerator tests passed');
+// Test: bitrate scales with pixel count (~0.25 bits/pixel, integer)
+console.assert(VideoGenerator.bitrateFor(1920, 1080, 30) === Math.round(1920 * 1080 * 0.25), '1080p bitrate must be pixels*0.25');
+console.assert(VideoGenerator.bitrateFor(3840, 2160, 30) > VideoGenerator.bitrateFor(1920, 1080, 30), '4K bitrate must exceed 1080p');
+
+// Test: framePlan — exact per-frame timestamps in seconds, constant duration
+const plan60 = VideoGenerator.framePlan(60000, 60);
+console.assert(plan60.times.length === 3601, '60s at 60fps plan must have 3601 times, got ' + plan60.times.length);
+console.assert(plan60.times[0] === 0, 'first plan time must be 0');
+console.assert(plan60.times[plan60.times.length - 1] === 60, 'last plan time must be exactly 60');
+console.assert(plan60.duration === 1 / 60, 'plan duration must be exactly 1/fps');
+const planFrac = VideoGenerator.framePlan(60367, 59.94);
+console.assert(planFrac.times[planFrac.times.length - 1] === 60.367, 'last fractional plan time must be exactly 60.367');
+
+// Test: trackOptions — frameRate metadata only for integer or standard fractional fps
+console.assert(JSON.stringify(VideoGenerator.trackOptions(30)) === JSON.stringify({ frameRate: 30 }), 'integer fps must pass frameRate');
+console.assert(JSON.stringify(VideoGenerator.trackOptions(60000 / 1001)) === JSON.stringify({ frameRate: 60000 / 1001 }), '59.94 must pass frameRate');
+console.assert(JSON.stringify(VideoGenerator.trackOptions(7.3)) === JSON.stringify({}), 'arbitrary fractional fps must omit frameRate');
+
+// Test: checkSupport gate (mock globals, restore after; promise chain — vm has no top-level await)
+VideoGenerator.checkSupport(1280, 720).then((supportNone) => {
+  console.assert(supportNone.ok === false && typeof supportNone.reason === 'string', 'missing VideoEncoder must fail with a reason');
+  VideoEncoder = { isConfigSupported: async () => ({ supported: false }) };
+  return VideoGenerator.checkSupport(1280, 720);
+}).then((supportNo) => {
+  console.assert(supportNo.ok === false, 'unsupported config must fail');
+  VideoEncoder = { isConfigSupported: async (cfg) => ({ supported: cfg.width === 1280 && cfg.codec === 'avc1.420034' }) };
+  return VideoGenerator.checkSupport(1280, 720);
+}).then((supportYes) => {
+  console.assert(supportYes.ok === true, 'supported config must pass');
+  VideoEncoder = undefined;
+  console.log('All VideoGenerator tests passed');
+});
 </script>
 </body>
 </html>

@@ -18,6 +18,50 @@ class VideoGenerator {
     if (this.cancelled) throw VideoGenerator.cancelledError();
   }
 
+  // Target bitrate in bits/sec (~0.25 bits/pixel): visually lossless for
+  // flat timer graphics on hardware H.264, file size grows instead.
+  static bitrateFor(width, height, fps) {
+    return Math.round(width * height * 0.25);
+  }
+
+  // Exact per-frame timestamps in seconds plus the constant frame duration.
+  // Duration is 1/fps for every frame (last frame included), so the output
+  // duration equals times.length/fps — the same as the ffmpeg build.
+  static framePlan(finalTimeMs, fps) {
+    return {
+      times: VideoGenerator.frameTimes(finalTimeMs, fps).map((ms) => ms / 1000),
+      duration: 1 / fps,
+    };
+  }
+
+  // fps metadata for the track: only integer fps or exact standard
+  // fractional rates (23.976/29.97/59.94 as exact x/1001 divisions).
+  // Arbitrary fractional fps relies on exact per-frame durations instead.
+  static trackOptions(fps) {
+    const standards = [24000 / 1001, 30000 / 1001, 60000 / 1001];
+    const known = Number.isInteger(fps) ||
+      standards.some((s) => Math.abs(fps - s) < 1e-9);
+    return known ? { frameRate: fps } : {};
+  }
+
+  // Runtime capability gate. Never throws: returns ok:false with a
+  // human-readable reason when WebCodecs H.264 encoding is unavailable.
+  static async checkSupport(width, height) {
+    if (typeof VideoEncoder === 'undefined') {
+      return { ok: false, reason: 'this browser has no WebCodecs VideoEncoder' };
+    }
+    try {
+      const result = await VideoEncoder.isConfigSupported({
+        codec: 'avc1.420034', width, height,
+      });
+      if (!result || result.supported === false) {
+        return { ok: false, reason: 'this browser cannot encode H.264 at this resolution' };
+      }
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, reason: 'H.264 support check failed: ' + (err && err.message ? err.message : err) };
+    }
+  }
   // Frame-count forecast for the estimate shown before generation starts.
   static estimate({ fps, finalTimeMs }) {
     const times = VideoGenerator.frameTimes(finalTimeMs, fps);
