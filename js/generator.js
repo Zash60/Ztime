@@ -1,6 +1,5 @@
 class VideoGenerator {
-  constructor(ffmpegLoader) {
-    this.ffmpegLoader = ffmpegLoader;
+  constructor() {
     this.cancelled = false;
   }
 
@@ -94,25 +93,6 @@ class VideoGenerator {
     return background === 'transparent' ? '#000000' : background;
   }
 
-  // x264 encode arguments. `-preset veryfast` encodes ~2-4x faster than the
-  // ffmpeg default (medium); `-crf 18` targets HIGHER quality than the
-  // default crf 23 (lower CRF = less compression = better). Preset only
-  // changes the speed/compression-ratio tradeoff at a fixed CRF, so output
-  // quality is preserved (file size grows instead). Codec and pixel format
-  // are unchanged.
-  static encodeArgs(fps) {
-    return [
-      '-framerate', String(fps),
-      '-i', 'frame_%06d.png',
-      '-c:v', 'libx264',
-      '-preset', 'veryfast',
-      '-crf', '18',
-      '-pix_fmt', 'yuv420p',
-      '-r', String(fps),
-      'output.mp4',
-    ];
-  }
-
   // Progress throttle: only notify when the rounded percent changes, so a
   // 3600-frame video fires ~100 DOM updates instead of ~3600.
   static shouldReport(lastRounded, percent) {
@@ -135,15 +115,26 @@ class VideoGenerator {
     return new Promise((resolve) => setTimeout(resolve, 0));
   }
 
+  // Wraps an encoder failure into the user-facing "unsupported" message.
+  static unsupportedError(reason) {
+    return new Error(
+      'Cannot generate video: ' + reason + ' (WebCodecs H.264 encoding is required)'
+    );
+  }
+
   async generate(config, onProgress, onPhase) {
     this.cancelled = false;
     const { fps, finalTimeMs, width, height, background, font, format } = config;
 
-    // Load ffmpeg
-    const ffmpeg = await this.ffmpegLoader.load();
+    // Capability gate first: never start work the browser cannot finish.
+    const support = await VideoGenerator.checkSupport(width, height);
+    if (!support.ok) throw VideoGenerator.unsupportedError(support.reason);
     this._checkCancelled();
 
-    const times = VideoGenerator.frameTimes(finalTimeMs, fps);
+    const mux = await VideoGenerator.loadMuxer();
+    this._checkCancelled();
+
+    const plan = VideoGenerator.framePlan(finalTimeMs, fps);
     const encodeBackground = VideoGenerator.effectiveBackground(background);
 
     // Create canvas
@@ -164,61 +155,57 @@ class VideoGenerator {
       if (onPhase) onPhase(text);
     };
 
-    // Single pass: draw every frame, then one encode. No segments, no concat.
     // The frame painter hoists static canvas state (font, alignment) out of
     // the loop — per-frame work is only fillRect + fillText.
-    const pending = new Set();
     const paint = TimerDisplay.createFramePainter(canvas, {
       background: encodeBackground, font, format,
     });
 
+    const output = new mux.Output({
+      format: new mux.Mp4OutputFormat(),
+      target: new mux.BufferTarget(),
+    });
+    const source = new mux.CanvasSource(canvas, {
+      codec: 'avc',
+      quality: new mux.Quality({ bitrate: VideoGenerator.bitrateFor(width, height, fps) }),
+    });
+    output.addVideoTrack(source, VideoGenerator.trackOptions(fps));
+
     try {
+      try {
+        await output.start();
+      } catch (err) {
+        throw VideoGenerator.unsupportedError(err && err.message ? err.message : String(err));
+      }
+      this._checkCancelled();
+
       phase('Drawing frames…');
-      for (let i = 0; i < times.length; i++) {
+      for (let i = 0; i < plan.times.length; i++) {
         this._checkCancelled();
-        paint(times[i], fps);
-
-        // Convert canvas to blob and write to ffmpeg
-        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
-        const arrayBuffer = await blob.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-
-        const frameName = `frame_${String(i).padStart(6, '0')}.png`;
-        ffmpeg.FS('writeFile', frameName, uint8Array);
-        pending.add(frameName);
+        paint(plan.times[i] * 1000, fps);
+        try {
+          source.add(plan.times[i], plan.duration);
+        } catch (err) {
+          throw VideoGenerator.unsupportedError(err && err.message ? err.message : String(err));
+        }
 
         // Yield periodically so the UI (incl. progress bar) stays responsive
         if (i % 60 === 0) await this._yieldToUI();
 
-        report(((i + 1) / times.length) * 90);
+        report(((i + 1) / plan.times.length) * 90);
       }
 
-      // One encode of the whole timeline
+      // Flush the encoder and finish the file
       this._checkCancelled();
       phase('Encoding video…');
-      await ffmpeg.run(...VideoGenerator.encodeArgs(fps));
+      await output.finalize();
       report(100);
 
-      // Read output (slice to the view's byte range, not the whole WASM heap)
-      const data = ffmpeg.FS('readFile', 'output.mp4');
-      const blob = new Blob(
-        [data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)],
-        { type: 'video/mp4' }
-      );
-
-      // Cleanup (every pending file exists exactly once here)
-      for (const n of pending) {
-        ffmpeg.FS('unlink', n);
-      }
-      ffmpeg.FS('unlink', 'output.mp4');
-
-      return blob;
+      return new Blob([output.target.buffer], { type: 'video/mp4' });
     } catch (err) {
-      // On cancel, free whatever this run wrote (best effort) and rethrow.
+      // On cancel, free the encoder resources and rethrow the CANCELLED error.
       if (err && err.code === 'CANCELLED') {
-        for (const n of pending) {
-          try { ffmpeg.FS('unlink', n); } catch (_) { /* already gone */ }
-        }
+        try { await output.cancel(); } catch (_) { /* already gone */ }
       }
       throw err;
     }

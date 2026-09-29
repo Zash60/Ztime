@@ -17,14 +17,6 @@ console.assert(t60.length === 3601, '60s at 60fps should give 3601 frame times, 
 console.assert(t60[0] === 0, 'first frame time must be 0');
 console.assert(t60[t60.length - 1] === 60000, 'last frame time must equal finalTimeMs');
 
-// Test: encode args — faster preset, quality >= ffmpeg default (crf <= 23; lower = better)
-const encArgs = VideoGenerator.encodeArgs(30);
-console.assert(Array.isArray(encArgs), 'encodeArgs must return an array');
-console.assert(encArgs[encArgs.indexOf('-preset') + 1] === 'veryfast', 'encode must use veryfast preset, got ' + encArgs.join(' '));
-const encCrf = Number(encArgs[encArgs.indexOf('-crf') + 1]);
-console.assert(encCrf <= 23, 'crf must be <= 23 to preserve quality, got ' + encCrf);
-console.assert(encArgs.includes('libx264') && encArgs.includes('yuv420p'), 'codec/pix_fmt must stay libx264/yuv420p');
-
 // Test: frame painter draws identical text to draw(), but sets static canvas state once
 function fakeCanvas() {
   const calls = { fontSets: 0, alignSets: 0, fillTexts: [] };
