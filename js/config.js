@@ -89,7 +89,6 @@ class ConfigPanel {
 
           <label for="background">Background</label>
           <select id="background">
-            <option value="transparent">Transparent (exports as black in MP4)</option>
             <option value="#000000">Black</option>
             <option value="#ffffff">White</option>
             <option value="#ff0000">Red</option>
@@ -107,7 +106,7 @@ class ConfigPanel {
           </select>
 
           <label for="fontSize">Font size (px)</label>
-          <input type="number" id="fontSize" value="48" min="8" max="200" step="1"
+          <input type="number" id="fontSize" value="180" min="8" max="200" step="1"
             aria-describedby="fontSizeHint fontSizeError">
           <p class="hint" id="fontSizeHint">8–200 px. Big timers stay readable after upload compression.</p>
           <p class="field-error" id="fontSizeError" aria-live="polite"></p>

@@ -331,15 +331,6 @@ h1::after {
   display: block;
 }
 
-.monitor.is-transparent canvas {
-  background-image:
-    linear-gradient(45deg, #2a2a44 25%, transparent 25%, transparent 75%, #2a2a44 75%),
-    linear-gradient(45deg, #2a2a44 25%, transparent 25%, transparent 75%, #2a2a44 75%);
-  background-color: #1a1a2e;
-  background-size: 24px 24px;
-  background-position: 0 0, 12px 12px;
-}
-
 .monitor-caption {
   margin-top: 10px;
   text-align: center;

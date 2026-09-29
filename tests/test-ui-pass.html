@@ -88,7 +88,7 @@ document = {
 };
 const pbox = { appendChild() {} };
 const preview = new Preview(pbox);
-preview.update({ fps: 60, width: 1280, height: 720, background: 'transparent', font: { family: 'monospace', size: 48, color: '#fff' }, format: 'mmm' });
+preview.update({ fps: 60, width: 1280, height: 720, background: '#000000', font: { family: 'monospace', size: 48, color: '#fff' }, format: 'mmm' });
 console.assert(/1280/.test(preview.caption.textContent) && /720/.test(preview.caption.textContent), 'caption must name dimensions, got ' + preview.caption.textContent);
 
 console.log('All UI pass tests passed');

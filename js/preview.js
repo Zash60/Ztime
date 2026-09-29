@@ -27,17 +27,9 @@ class Preview {
     this.canvas.width = width;
     this.canvas.height = height;
 
-    // Output-monitor treatment: checkerboard signals transparency (which
-    // exports as black in MP4), and the caption names the real dimensions.
-    const transparent = background === 'transparent';
+    // Output-monitor treatment: the caption names the real dimensions.
     try {
-      if (this.figure && this.figure.classList && typeof this.figure.classList.toggle === 'function') {
-        this.figure.classList.toggle('is-transparent', transparent);
-      }
-    } catch (_) { /* test stubs */ }
-    const bgName = transparent ? 'transparent (exports as black)' : background;
-    try {
-      if (this.caption) this.caption.textContent = `${width}×${height} · ${bgName}`;
+      if (this.caption) this.caption.textContent = `${width}×${height} · ${background}`;
     } catch (_) { /* test stubs */ }
 
     // Draw initial frame (time = 0) once the font is ready, so the preview
