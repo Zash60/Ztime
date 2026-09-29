@@ -17,6 +17,41 @@ console.assert(t60.length === 3601, '60s at 60fps should give 3601 frame times, 
 console.assert(t60[0] === 0, 'first frame time must be 0');
 console.assert(t60[t60.length - 1] === 60000, 'last frame time must equal finalTimeMs');
 
+// Test: encode args — faster preset, quality >= ffmpeg default (crf <= 23; lower = better)
+const encArgs = VideoGenerator.encodeArgs(30);
+console.assert(Array.isArray(encArgs), 'encodeArgs must return an array');
+console.assert(encArgs[encArgs.indexOf('-preset') + 1] === 'veryfast', 'encode must use veryfast preset, got ' + encArgs.join(' '));
+const encCrf = Number(encArgs[encArgs.indexOf('-crf') + 1]);
+console.assert(encCrf <= 23, 'crf must be <= 23 to preserve quality, got ' + encCrf);
+console.assert(encArgs.includes('libx264') && encArgs.includes('yuv420p'), 'codec/pix_fmt must stay libx264/yuv420p');
+
+// Test: frame painter draws identical text to draw(), but sets static canvas state once
+function fakeCanvas() {
+  const calls = { fontSets: 0, alignSets: 0, fillTexts: [] };
+  const ctx = {
+    _font: '', _align: '',
+    fillStyle: '', textBaseline: '',
+    fillRect() {}, clearRect() {},
+    fillText(t) { calls.fillTexts.push(t); },
+  };
+  Object.defineProperty(ctx, 'font', { get() { return this._font; }, set(v) { calls.fontSets++; this._font = v; } });
+  Object.defineProperty(ctx, 'textAlign', { get() { return this._align; }, set(v) { calls.alignSets++; this._align = v; } });
+  return { width: 640, height: 100, _calls: calls, getContext() { return ctx; } };
+}
+const paintOpts = { background: '#000000', font: { family: 'monospace', size: 48, color: '#ffffff' }, format: 'mmm' };
+const c1 = fakeCanvas();
+const paint = TimerDisplay.createFramePainter(c1, paintOpts);
+paint(0, 60); paint(16.666666666666668, 60); paint(33.333333333333336, 60);
+console.assert(c1._calls.fontSets === 1, 'painter must set font once for N frames, got ' + c1._calls.fontSets);
+console.assert(c1._calls.alignSets === 1, 'painter must set textAlign once for N frames, got ' + c1._calls.alignSets);
+const c2 = fakeCanvas();
+[0, 16.666666666666668, 33.333333333333336].forEach((t) => TimerDisplay.draw(c2, t, 60, paintOpts));
+console.assert(JSON.stringify(c1._calls.fillTexts) === JSON.stringify(c2._calls.fillTexts), 'painter output must match draw() output');
+
+// Test: progress throttle — only fire when the rounded percent actually changes
+console.assert(VideoGenerator.shouldReport(23, 23.2) === false, 'same rounded percent must not report');
+console.assert(VideoGenerator.shouldReport(23, 23.6) === true, 'changed rounded percent must report');
+
 console.log('All VideoGenerator tests passed');
 </script>
 </body>

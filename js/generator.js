@@ -30,6 +30,31 @@ class VideoGenerator {
     return background === 'transparent' ? '#000000' : background;
   }
 
+  // x264 encode arguments. `-preset veryfast` encodes ~2-4x faster than the
+  // ffmpeg default (medium); `-crf 18` targets HIGHER quality than the
+  // default crf 23 (lower CRF = less compression = better). Preset only
+  // changes the speed/compression-ratio tradeoff at a fixed CRF, so output
+  // quality is preserved (file size grows instead). Codec and pixel format
+  // are unchanged.
+  static encodeArgs(fps) {
+    return [
+      '-framerate', String(fps),
+      '-i', 'frame_%06d.png',
+      '-c:v', 'libx264',
+      '-preset', 'veryfast',
+      '-crf', '18',
+      '-pix_fmt', 'yuv420p',
+      '-r', String(fps),
+      'output.mp4',
+    ];
+  }
+
+  // Progress throttle: only notify when the rounded percent changes, so a
+  // 3600-frame video fires ~100 DOM updates instead of ~3600.
+  static shouldReport(lastRounded, percent) {
+    return Math.min(100, Math.round(percent)) !== lastRounded;
+  }
+
   // Frame display times in ms: starts at 0 and always ends exactly at
   // finalTimeMs, so the requested final time is visible in the video.
   static frameTimes(finalTimeMs, fps) {
@@ -62,21 +87,32 @@ class VideoGenerator {
     canvas.width = width;
     canvas.height = height;
 
-    const report = (percent) => {
-      if (onProgress) onProgress(Math.min(100, Math.round(percent)));
-    };
+    const report = (() => {
+      let lastRounded = -1;
+      return (percent) => {
+        if (onProgress && VideoGenerator.shouldReport(lastRounded, percent)) {
+          lastRounded = Math.min(100, Math.round(percent));
+          onProgress(lastRounded);
+        }
+      };
+    })();
     const phase = (text) => {
       if (onPhase) onPhase(text);
     };
 
     // Single pass: draw every frame, then one encode. No segments, no concat.
+    // The frame painter hoists static canvas state (font, alignment) out of
+    // the loop — per-frame work is only fillRect + fillText.
     const pending = new Set();
+    const paint = TimerDisplay.createFramePainter(canvas, {
+      background: encodeBackground, font, format,
+    });
 
     try {
       phase('Drawing frames…');
       for (let i = 0; i < times.length; i++) {
         this._checkCancelled();
-        TimerDisplay.draw(canvas, times[i], fps, { background: encodeBackground, font, format });
+        paint(times[i], fps);
 
         // Convert canvas to blob and write to ffmpeg
         const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
@@ -88,7 +124,7 @@ class VideoGenerator {
         pending.add(frameName);
 
         // Yield periodically so the UI (incl. progress bar) stays responsive
-        if (i % 30 === 0) await this._yieldToUI();
+        if (i % 60 === 0) await this._yieldToUI();
 
         report(((i + 1) / times.length) * 90);
       }
@@ -96,14 +132,7 @@ class VideoGenerator {
       // One encode of the whole timeline
       this._checkCancelled();
       phase('Encoding video…');
-      await ffmpeg.run(
-        '-framerate', String(fps),
-        '-i', 'frame_%06d.png',
-        '-c:v', 'libx264',
-        '-pix_fmt', 'yuv420p',
-        '-r', String(fps),
-        'output.mp4'
-      );
+      await ffmpeg.run(...VideoGenerator.encodeArgs(fps));
       report(100);
 
       // Read output (slice to the view's byte range, not the whole WASM heap)
