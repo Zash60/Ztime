@@ -180,6 +180,9 @@ class VideoGenerator {
     });
     const source = new mux.CanvasSource(canvas, {
       codec: 'avc',
+      // Realtime mode: no B-frames or pipeline delay, so the first frame
+      // presents at t=0 instead of after an encoder-delay gap.
+      latencyMode: 'realtime',
       quality: new mux.Quality({ bitrate: VideoGenerator.bitrateFor(width, height, fps) }),
     });
     output.addVideoTrack(source, VideoGenerator.trackOptions(fps));

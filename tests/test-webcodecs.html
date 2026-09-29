@@ -96,6 +96,7 @@ function runGenerateTests() {
     console.assert(JSON.stringify(genCalls.add) === JSON.stringify(expected.times.map((t) => [t, expected.duration])), 'source.add must receive exact framePlan timestamps');
     console.assert(JSON.stringify(genCalls.trackOpts) === JSON.stringify(VideoGenerator.trackOptions(10)), 'track must receive trackOptions(fps)');
     console.assert(genCalls.sourceOpts && genCalls.sourceOpts.codec === 'avc', 'source must use avc codec');
+    console.assert(genCalls.sourceOpts && genCalls.sourceOpts.latencyMode === 'realtime', 'source must use realtime latency (no encoder delay at start)');
     console.assert(genCalls.finalized === true, 'output must be finalized');
     console.assert(runGenerateTests.blob && runGenerateTests.blob.type === 'video/mp4', 'result must be a video/mp4 Blob');
     console.assert(percents.length > 0 && percents.every((p) => Number.isInteger(p)), 'progress must fire rounded ints only');
