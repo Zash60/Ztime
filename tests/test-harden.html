@@ -2,7 +2,6 @@
 <html>
 <head><link rel="icon" href="data:,"><meta charset="utf-8"><title>Harden Test</title></head>
 <body>
-<script src="../js/ffmpeg-loader.js"></script>
 <script src="../js/timer.js"></script>
 <script src="../js/generator.js"></script>
 <script src="../js/config.js"></script>
@@ -33,7 +32,7 @@ console.assert(Math.abs(est.seconds - 60.367) < 1e-9, 'estimate seconds should b
 console.assert(!('chunks' in est), 'estimate must not report segments anymore');
 
 // 2. Cancel flag lifecycle (+ reset at generate start)
-const gen = new VideoGenerator(null);
+const gen = new VideoGenerator();
 console.assert(gen.cancelled === false, 'fresh generator is not cancelled');
 gen.cancel();
 console.assert(gen.cancelled === true, 'cancel() sets the flag');

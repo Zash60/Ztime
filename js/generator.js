@@ -25,7 +25,8 @@ class VideoGenerator {
 
   // Exact per-frame timestamps in seconds plus the constant frame duration.
   // Duration is 1/fps for every frame (last frame included), so the output
-  // duration equals times.length/fps — the same as the ffmpeg build.
+  // duration equals times.length/fps — the same duration the previous
+  // software-encode engine produced for the same frame plan.
   static framePlan(finalTimeMs, fps) {
     return {
       times: VideoGenerator.frameTimes(finalTimeMs, fps).map((ms) => ms / 1000),

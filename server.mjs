@@ -1,8 +1,6 @@
-// Dev/static server for the Speedrun Timer app.
-//
-// ffmpeg.wasm needs SharedArrayBuffer, which requires a cross-origin
-// isolated page, so this server sends COOP/COEP headers. Plain static
-// servers (e.g. `python3 -m http.server`) will NOT work for generation.
+// Dev/static server for the Speedrun Timer app. Plain static files, no
+// special headers needed (the WebCodecs engine uses no SharedArrayBuffer).
+// Any static server works, e.g. `python3 -m http.server`.
 //
 // Usage: node server.mjs [port]   (default 8899)
 import http from 'node:http';
@@ -15,6 +13,7 @@ const PORT = Number(process.argv[2] || 8899);
 const TYPES = {
   '.html': 'text/html',
   '.js': 'text/javascript',
+  '.mjs': 'text/javascript',
   '.css': 'text/css',
   '.json': 'application/json',
   '.png': 'image/png',
@@ -32,8 +31,6 @@ http.createServer((req, res) => {
     }
     res.writeHead(200, {
       'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream',
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'credentialless',
     });
     res.end(data);
   });

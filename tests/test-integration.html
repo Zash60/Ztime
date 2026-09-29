@@ -2,7 +2,6 @@
 <html>
 <head><link rel="icon" href="data:,"><meta charset="utf-8"><title>Integration Test</title></head>
 <body>
-<script src="../js/ffmpeg-loader.js"></script>
 <script src="../js/timer.js"></script>
 <script src="../js/generator.js"></script>
 <script src="../js/config.js"></script>
@@ -10,7 +9,6 @@
 <script src="../js/app.js"></script>
 <script>
 // Integration test: verify all components work together
-console.assert(typeof FFmpegLoader === 'function', 'FFmpegLoader must exist');
 console.assert(typeof TimerDisplay === 'function', 'TimerDisplay must exist');
 console.assert(typeof VideoGenerator === 'function', 'VideoGenerator must exist');
 console.assert(typeof ConfigPanel === 'function', 'ConfigPanel must exist');

@@ -1,6 +1,5 @@
 class App {
   constructor() {
-    this.ffmpegLoader = new FFmpegLoader();
     this.videoGenerator = null;
     this.configPanel = null;
     this.preview = null;
@@ -57,7 +56,7 @@ class App {
 
     try {
       if (!this.videoGenerator) {
-        this.videoGenerator = new VideoGenerator(this.ffmpegLoader);
+        this.videoGenerator = new VideoGenerator();
       }
 
       const blob = await this.videoGenerator.generate(
