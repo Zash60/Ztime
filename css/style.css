@@ -69,14 +69,24 @@ h1::after {
 }
 
 .config-panel h2 {
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.03em;
+  line-height: 1;
   color: #fff;
-  padding-bottom: 12px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #0f3460;
+  padding-bottom: 0;
+  margin-bottom: 6px;
+  border-bottom: none;
+}
+
+.config-panel h2::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 4px;
+  background: #e94560;
+  border-radius: 4px;
+  margin: 12px 0 4px;
 }
 
 .config-panel label {
@@ -122,6 +132,48 @@ h1::after {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #fff;
+}
+
+/* Bolder peak: Timing is the decisive move. Same brand, full strength —
+   elevated surface from the system's own palette, hero time entry in the
+   vendored timer voice, and one accent-wash readout (the single allowed
+   addition: rgba(233,69,96,.10) to make the format result legible). */
+.config-panel fieldset.cfg-group:first-of-type {
+  background: #1a1a2e;
+  border-color: #0f3460;
+  padding-top: 8px;
+  padding-bottom: 18px;
+  margin-top: 20px;
+}
+
+.config-panel #finalTime {
+  font-family: 'JetBrains Mono', 'Space Mono', 'Share Tech Mono', ui-monospace, monospace;
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  padding: 12px 14px;
+  border-width: 1px;
+}
+
+.config-panel #finalTime::selection {
+  background: #e94560;
+  color: #fff;
+}
+
+.config-panel .format-example {
+  margin-top: 10px;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', 'Space Mono', ui-monospace, monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  background: rgba(233, 69, 96, 0.1);
+  border: 1px solid rgba(233, 69, 96, 0.4);
+  border-radius: 4px;
+  color: #fff;
+  overflow-wrap: break-word;
 }
 
 .cfg-group label {
@@ -183,18 +235,6 @@ h1::after {
 .config-panel input[aria-invalid="true"],
 .config-panel select[aria-invalid="true"] {
   border-color: #ff6b6b;
-}
-
-.format-example {
-  margin-top: 8px;
-  padding: 8px 12px;
-  font-family: ui-monospace, monospace;
-  font-size: 0.9rem;
-  background: #1a1a2e;
-  border: 1px dashed #0f3460;
-  border-radius: 4px;
-  color: #fff;
-  overflow-wrap: break-word;
 }
 
 .format-example:empty {
