@@ -1,2 +1,7 @@
+# Build artifacts
+speedrun-timer-demo.mp4
+
+# Tooling / local state
 .playwright-mcp/
 .superpowers/
+.impeccable/
