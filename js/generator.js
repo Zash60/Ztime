@@ -196,8 +196,10 @@ class VideoGenerator {
       for (let i = 0; i < plan.times.length; i++) {
         this._checkCancelled();
         paint(plan.times[i] * 1000, fps);
+        // Awaited: respects writer and encoder backpressure (required by the
+        // source contract; fire-and-forget starves hardware encoders).
         try {
-          source.add(plan.times[i], plan.duration);
+          await source.add(plan.times[i], plan.duration);
         } catch (err) {
           throw VideoGenerator.unsupportedError(err && err.message ? err.message : String(err));
         }

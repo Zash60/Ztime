@@ -65,7 +65,12 @@ function fakeModule(calls) {
     BufferTarget: class { constructor() { this.buffer = new Uint8Array([9, 9]).buffer; } },
     CanvasSource: class {
       constructor(c, o) { calls.sourceOpts = o; }
-      add(t, d) { calls.add.push([t, d]); }
+      add(t, d) {
+        calls.add.push([t, d]);
+        calls.inflight = (calls.inflight || 0) + 1;
+        calls.maxInflight = Math.max(calls.maxInflight || 0, calls.inflight);
+        return Promise.resolve().then(() => { calls.inflight--; });
+      }
     },
     Quality: class { constructor(o) { calls.quality = o; } },
   };
@@ -94,6 +99,7 @@ function runGenerateTests() {
     console.assert(genCalls.finalized === true, 'output must be finalized');
     console.assert(runGenerateTests.blob && runGenerateTests.blob.type === 'video/mp4', 'result must be a video/mp4 Blob');
     console.assert(percents.length > 0 && percents.every((p) => Number.isInteger(p)), 'progress must fire rounded ints only');
+    console.assert(genCalls.maxInflight === 1, 'must await each add (encoder backpressure), max in-flight was ' + genCalls.maxInflight);
     console.assert(order.length >= 2 && order[0][0] === 'font' && order[0][1] === cfg.font.family, 'font must load before first paint, got ' + JSON.stringify(order.slice(0, 2)));
     console.assert(order[1][0] === 'paint', 'paint must follow font load');
 
