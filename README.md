@@ -14,6 +14,12 @@ Generate pixel-accurate MP4 videos of a speedrun timer counting from 0 to your f
 - **Live preview** — see the timer before you generate
 - **Cancel anytime** — stop generation mid-encode without losing your config
 
+## Screenshots
+
+| Desktop | Mobile |
+|---|---|
+| ![Desktop](screenshots/desktop.png) | ![Mobile](screenshots/mobile.png) |
+
 ## Quick Start
 
 ```bash
