@@ -59,26 +59,6 @@ Any static file server works — no build step, no dependencies.
 
 The app detects unsupported browsers and shows a clear message before you start.
 
-## Project Structure
-
-```
-Ztime/
-├── index.html              # App entry point
-├── server.mjs              # Zero-dependency static file server
-├── css/
-│   ├── style.css           # App styles
-│   └── fonts.css           # @font-face declarations
-├── js/
-│   ├── timer.js            # Timer display logic + frame painter
-│   ├── generator.js        # WebCodecs encode pipeline
-│   ├── config.js           # Config panel UI + validation
-│   ├── preview.js          # Live preview monitor
-│   └── app.js              # App orchestration
-├── fonts/                  # 6 vendored monospace woff2 + licenses
-└── vendor/
-    └── mediabunny/         # Vendored MP4 muxer (MPL-2.0)
-```
-
 ## License
 
 Code: MIT (see commit history). Fonts: SIL Open Font License 1.1 / Ubuntu Font License 1.0 (see `fonts/`). Mediabunny: MPL-2.0 (see `vendor/mediabunny/LICENSE`).
