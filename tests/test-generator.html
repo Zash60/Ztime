@@ -62,6 +62,9 @@ console.assert(JSON.stringify(VideoGenerator.trackOptions(60000 / 1001)) === JSO
 console.assert(JSON.stringify(VideoGenerator.trackOptions(7.3)) === JSON.stringify({}), 'arbitrary fractional fps must omit frameRate');
 
 // Test: checkSupport gate (mock globals, restore after; promise chain — vm has no top-level await)
+// Force the missing-encoder case first: real browsers HAVE VideoEncoder.
+const savedVE = (typeof VideoEncoder !== 'undefined') ? VideoEncoder : undefined;
+VideoEncoder = undefined;
 VideoGenerator.checkSupport(1280, 720).then((supportNone) => {
   console.assert(supportNone.ok === false && typeof supportNone.reason === 'string', 'missing VideoEncoder must fail with a reason');
   VideoEncoder = { isConfigSupported: async () => ({ supported: false }) };
@@ -72,7 +75,7 @@ VideoGenerator.checkSupport(1280, 720).then((supportNone) => {
   return VideoGenerator.checkSupport(1280, 720);
 }).then((supportYes) => {
   console.assert(supportYes.ok === true, 'supported config must pass');
-  VideoEncoder = undefined;
+  VideoEncoder = savedVE;
   console.log('All VideoGenerator tests passed');
 });
 </script>
