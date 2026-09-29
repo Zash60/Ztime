@@ -13,6 +13,20 @@ console.assert(typeof App === 'function', 'App must be a function');
 // Test: init() exists (check prototype to avoid constructor side effects)
 console.assert(typeof App.prototype.init === 'function', 'init must be a function');
 
+// Test: preview refreshes on both input (mobile keyboards) and change events
+const listened = [];
+const btnStub = () => ({ value: '60', style: {}, disabled: false, textContent: '', innerHTML: '', addEventListener: () => {}, querySelector: () => btnStub(), click: () => {} });
+const configEl = { innerHTML: '', querySelector: (s) => btnStub(), addEventListener: (ev, cb) => listened.push(ev) };
+const previewEl = { appendChild: () => {} };
+document = {
+  getElementById: (id) => id === 'configContainer' ? configEl : previewEl,
+  createElement: () => ({ width: 0, height: 0, getContext: () => ({ clearRect() {}, fillRect() {}, fillText() {}, set fillStyle(v) {}, set font(v) {}, set textAlign(v) {}, set textBaseline(v) {} }) }),
+  addEventListener: () => {},
+};
+new App().init();
+console.assert(listened.includes('input'), 'must listen input for live preview, got ' + JSON.stringify(listened));
+console.assert(listened.includes('change'), 'must keep change listener, got ' + JSON.stringify(listened));
+
 console.log('All App tests passed');
 </script>
 </body>

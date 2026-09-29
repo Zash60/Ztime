@@ -21,15 +21,19 @@ class App {
       if (this.videoGenerator) this.videoGenerator.cancel();
     });
 
-    // Update preview + estimate when config changes
-    configContainer.addEventListener('change', () => {
+    // Update preview + estimate when config changes. Listen to both
+    // 'input' (fires per keystroke/selection — the only timely event for
+    // mobile keyboards) and 'change' (fires on blur/commit).
+    const refresh = () => {
       if (this.configPanel.validate()) {
         const config = this.configPanel.getConfig();
         this.preview.update(config);
         this.configPanel.hideError();
         this._updateEstimate();
       }
-    });
+    };
+    configContainer.addEventListener('input', refresh);
+    configContainer.addEventListener('change', refresh);
 
     // Initial preview + estimate
     this.preview.update(this.configPanel.getConfig());
