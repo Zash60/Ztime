@@ -22,6 +22,9 @@ Open http://127.0.0.1:8899/, configure FPS / final time / resolution /
 background / font / format, click **Generate Video**. Video generation
 works offline after the first page load.
 
+Timer fonts are vendored under `fonts/` (6 monospace faces + system
+fallback; see `fonts/ATTRIBUTION.md`) — no system fonts required.
+
 ## Tests
 
 Node (fast, no browser):

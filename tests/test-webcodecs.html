@@ -74,9 +74,11 @@ function fakeModule(calls) {
 function runGenerateTests() {
   document = { createElement: () => ({ width: 0, height: 0 }) };
   setTimeout = (fn) => { fn(); return 0; };
-  TimerDisplay.createFramePainter = () => () => {};
+  const order = [];
+  const realEnsure = TimerDisplay.ensureFont;
+  TimerDisplay.ensureFont = async (font) => { order.push(['font', font.family]); };
+  TimerDisplay.createFramePainter = (...args) => { order.push(['paint']); return () => {}; };
   Blob = function (parts, opts) { runGenerateTests.blob = { parts, type: opts && opts.type }; };
-  VideoEncoder = undefined;
 
   const genCalls = { add: [] };
   VideoGenerator._importMuxer = async () => fakeModule(genCalls);
@@ -92,6 +94,8 @@ function runGenerateTests() {
     console.assert(genCalls.finalized === true, 'output must be finalized');
     console.assert(runGenerateTests.blob && runGenerateTests.blob.type === 'video/mp4', 'result must be a video/mp4 Blob');
     console.assert(percents.length > 0 && percents.every((p) => Number.isInteger(p)), 'progress must fire rounded ints only');
+    console.assert(order.length >= 2 && order[0][0] === 'font' && order[0][1] === cfg.font.family, 'font must load before first paint, got ' + JSON.stringify(order.slice(0, 2)));
+    console.assert(order[1][0] === 'paint', 'paint must follow font load');
 
     let imports = 0;
     VideoGenerator._importMuxer = async () => { imports++; return fakeModule({ add: [] }); };
@@ -139,6 +143,7 @@ function runGenerateTests() {
   }).then(() => {
     VideoGenerator.checkSupport = realCheck;
     TimerDisplay.createFramePainter = realPainter;
+    TimerDisplay.ensureFont = realEnsure;
     VideoGenerator._importMuxer = realImport;
     VideoGenerator._muxerPromise = null;
   });

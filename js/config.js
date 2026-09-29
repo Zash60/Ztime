@@ -23,6 +23,20 @@ class ConfigPanel {
     return ((hours * 60 + minutes) * 60 + seconds) * 1000 + ms;
   }
 
+  // Single source of truth for the font select. Values must match the
+  // @font-face family names in css/fonts.css (plus the generic fallback).
+  static getFontFamilies() {
+    return [
+      { value: 'JetBrains Mono', label: 'JetBrains Mono' },
+      { value: 'IBM Plex Mono', label: 'IBM Plex Mono' },
+      { value: 'Space Mono', label: 'Space Mono' },
+      { value: 'Roboto Mono', label: 'Roboto Mono' },
+      { value: 'Ubuntu Mono', label: 'Ubuntu Mono' },
+      { value: 'Cascadia Code', label: 'Cascadia Code' },
+      { value: 'monospace', label: 'System monospace' },
+    ];
+  }
+
   _render() {
     this.container.innerHTML = `
       <div class="config-panel">
@@ -53,10 +67,7 @@ class ConfigPanel {
 
         <label>Font Family:</label>
         <select id="fontFamily">
-          <option value="monospace" selected>Monospace</option>
-          <option value="Arial">Arial</option>
-          <option value="Helvetica">Helvetica</option>
-          <option value="Courier New">Courier New</option>
+          ${ConfigPanel.getFontFamilies().map((f, i) => `<option value="${f.value}"${i === 0 ? ' selected' : ''}>${f.label}</option>`).join('')}
         </select>
 
         <label>Font Size (px):</label>

@@ -166,7 +166,10 @@ class VideoGenerator {
     };
 
     // The frame painter hoists static canvas state (font, alignment) out of
-    // the loop — per-frame work is only fillRect + fillText.
+    // the loop — per-frame work is only fillRect + fillText. The font must
+    // be loaded before the painter snapshots it.
+    await TimerDisplay.ensureFont(font);
+    this._checkCancelled();
     const paint = TimerDisplay.createFramePainter(canvas, {
       background: encodeBackground, font, format,
     });

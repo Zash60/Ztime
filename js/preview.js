@@ -11,8 +11,11 @@ class Preview {
     this.canvas.width = width;
     this.canvas.height = height;
 
-    // Draw initial frame (time = 0)
-    TimerDisplay.draw(this.canvas, 0, fps, { background, font, format });
+    // Draw initial frame (time = 0) once the font is ready, so the preview
+    // never shows a fallback-font flash.
+    TimerDisplay.ensureFont(font).then(() => {
+      TimerDisplay.draw(this.canvas, 0, fps, { background, font, format });
+    });
   }
 
   getCanvas() {

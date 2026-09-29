@@ -40,7 +40,12 @@ console.assert(TimerDisplay.formatTime(90233.33333333333, 60, 'sscc') === '90.23
 console.assert(TimerDisplay.formatTime(90233.33333333333, 60, 'ssd') === '90.2', 'ssd should be 90.2');
 console.assert(TimerDisplay.formatTime(90000, 60, 'ssmmm') === '90.000', '90000ms ssmmm should be 90.000');
 
-console.log('All TimerDisplay tests passed');
+// Test: ensureFont resolves safely without a document (Node) and is awaitable
+console.assert(typeof TimerDisplay.ensureFont === 'function', 'ensureFont must be a function');
+TimerDisplay.ensureFont({ family: 'JetBrains Mono', size: 48 }).then((v) => {
+  console.assert(v === undefined, 'ensureFont without document must resolve undefined');
+  console.log('All TimerDisplay font tests passed');
+});
 </script>
 </body>
 </html>

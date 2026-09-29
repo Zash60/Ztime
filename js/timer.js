@@ -40,6 +40,15 @@ class TimerDisplay {
     }
   }
 
+  // Ensures a timer font is loaded before canvas draws use it — otherwise
+  // the browser silently substitutes a fallback. Safe no-op without a
+  // document (Node tests) or when the Font Loading API is unavailable.
+  static async ensureFont(font) {
+    if (typeof document === 'undefined' || !document.fonts || typeof document.fonts.load !== 'function') return;
+    try {
+      await document.fonts.load(`${font.size}px "${font.family}"`, '0123456789:,.');
+    } catch (_) { /* fall back to whatever is available */ }
+  }
   // Frame painter: hoists static canvas state (context, font, alignment)
   // once, so per-frame work is only fillRect + fillText. Drawing output is
   // identical to draw() — this is purely fewer state changes per frame.
