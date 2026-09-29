@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>Harden Test</title></head>
+<head><link rel="icon" href="data:,"><meta charset="utf-8"><title>Harden Test</title></head>
 <body>
 <script src="../js/ffmpeg-loader.js"></script>
 <script src="../js/timer.js"></script>
@@ -26,10 +26,11 @@ const container = {
   addEventListener: () => {},
 };
 
-// 1. Estimate math (pure): 60.367s @30fps -> ceil(1811.01)=1812 + final frame = 1813 frames, 4 chunks
+// 1. Estimate math (pure, single pass): 60.367s @30fps -> ceil(1811.01)=1812 + final frame = 1813 frames
 const est = VideoGenerator.estimate({ fps: 30, finalTimeMs: 60367 });
 console.assert(est.frames === 1813, 'estimate frames should be 1813, got ' + est.frames);
-console.assert(est.chunks === 4, 'estimate chunks should be 4, got ' + est.chunks);
+console.assert(Math.abs(est.seconds - 60.367) < 1e-9, 'estimate seconds should be 60.367, got ' + est.seconds);
+console.assert(!('chunks' in est), 'estimate must not report segments anymore');
 
 // 2. Cancel flag lifecycle (+ reset at generate start)
 const gen = new VideoGenerator(null);

@@ -18,32 +18,16 @@ class VideoGenerator {
     if (this.cancelled) throw VideoGenerator.cancelledError();
   }
 
-  // Frame/chunk forecast for the estimate shown before generation starts.
+  // Frame-count forecast for the estimate shown before generation starts.
   static estimate({ fps, finalTimeMs }) {
     const times = VideoGenerator.frameTimes(finalTimeMs, fps);
-    const chunks = VideoGenerator.chunkRanges(times.length, VideoGenerator.CHUNK_FRAMES).length;
-    return { frames: times.length, chunks, seconds: finalTimeMs / 1000 };
+    return { frames: times.length, seconds: finalTimeMs / 1000 };
   }
 
   // MP4 (H.264/yuv420p) cannot carry an alpha channel. Resolve "transparent"
   // to an explicit opaque fallback so the export is never silently wrong.
   static effectiveBackground(background) {
     return background === 'transparent' ? '#000000' : background;
-  }
-
-  // Frames per ffmpeg encode segment. Keeps MEMFS usage bounded so long
-  // videos (e.g. 1h at 60fps) don't exhaust tab memory.
-  static get CHUNK_FRAMES() {
-    return 600;
-  }
-
-  // Partition `totalFrames` frame indices into {start, end} ranges (end exclusive).
-  static chunkRanges(totalFrames, chunkSize) {
-    const ranges = [];
-    for (let start = 0; start < totalFrames; start += chunkSize) {
-      ranges.push({ start, end: Math.min(start + chunkSize, totalFrames) });
-    }
-    return ranges;
   }
 
   // Frame display times in ms: starts at 0 and always ends exactly at
@@ -62,7 +46,7 @@ class VideoGenerator {
     return new Promise((resolve) => setTimeout(resolve, 0));
   }
 
-  async generate(config, onProgress) {
+  async generate(config, onProgress, onPhase) {
     this.cancelled = false;
     const { fps, finalTimeMs, width, height, background, font, format } = config;
 
@@ -81,67 +65,45 @@ class VideoGenerator {
     const report = (percent) => {
       if (onProgress) onProgress(Math.min(100, Math.round(percent)));
     };
+    const phase = (text) => {
+      if (onPhase) onPhase(text);
+    };
 
-    // Encode in chunks: write a chunk's PNGs, encode the segment, then free
-    // the PNGs immediately so memory stays bounded for any video length.
-    const ranges = VideoGenerator.chunkRanges(times.length, VideoGenerator.CHUNK_FRAMES);
-    const segmentNames = [];
-    // Files currently in MEMFS. Every entry is unlinked exactly once, either
-    // when its chunk is freed or in final cleanup (double-unlink throws).
+    // Single pass: draw every frame, then one encode. No segments, no concat.
     const pending = new Set();
 
     try {
-      for (let c = 0; c < ranges.length; c++) {
-        const { start, end } = ranges[c];
-
-        for (let i = start; i < end; i++) {
-          this._checkCancelled();
-          TimerDisplay.draw(canvas, times[i], fps, { background: encodeBackground, font, format });
-
-          // Convert canvas to blob and write to ffmpeg
-          const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
-          const arrayBuffer = await blob.arrayBuffer();
-          const uint8Array = new Uint8Array(arrayBuffer);
-
-          const frameName = `chunk_${c}_${String(i - start).padStart(6, '0')}.png`;
-          ffmpeg.FS('writeFile', frameName, uint8Array);
-          pending.add(frameName);
-
-          // Yield periodically so the UI (incl. progress bar) stays responsive
-          if ((i - start) % 30 === 0) await this._yieldToUI();
-
-          report(((c + (i - start + 1) / (end - start)) / ranges.length) * 90);
-        }
-
-        // Encode this chunk into a segment
+      phase('Drawing frames…');
+      for (let i = 0; i < times.length; i++) {
         this._checkCancelled();
-        const segName = `segment_${c}.mp4`;
-        await ffmpeg.run(
-          '-framerate', String(fps),
-          '-i', `chunk_${c}_%06d.png`,
-          '-c:v', 'libx264',
-          '-pix_fmt', 'yuv420p',
-          '-r', String(fps),
-          segName
-        );
+        TimerDisplay.draw(canvas, times[i], fps, { background: encodeBackground, font, format });
 
-        // Free the chunk's PNGs right away
-        for (let i = start; i < end; i++) {
-          const frameName = `chunk_${c}_${String(i - start).padStart(6, '0')}.png`;
-          ffmpeg.FS('unlink', frameName);
-          pending.delete(frameName);
-        }
-        segmentNames.push(segName);
-        pending.add(segName);
-        report(((c + 1) / ranges.length) * 90);
+        // Convert canvas to blob and write to ffmpeg
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+        const arrayBuffer = await blob.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+
+        const frameName = `frame_${String(i).padStart(6, '0')}.png`;
+        ffmpeg.FS('writeFile', frameName, uint8Array);
+        pending.add(frameName);
+
+        // Yield periodically so the UI (incl. progress bar) stays responsive
+        if (i % 30 === 0) await this._yieldToUI();
+
+        report(((i + 1) / times.length) * 90);
       }
 
-      // Concatenate segments into the final video
+      // One encode of the whole timeline
       this._checkCancelled();
-      const listContent = segmentNames.map((n) => `file '${n}'`).join('\n');
-      ffmpeg.FS('writeFile', 'concat.txt', new TextEncoder().encode(listContent));
-      pending.add('concat.txt');
-      await ffmpeg.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c', 'copy', 'output.mp4');
+      phase('Encoding video…');
+      await ffmpeg.run(
+        '-framerate', String(fps),
+        '-i', 'frame_%06d.png',
+        '-c:v', 'libx264',
+        '-pix_fmt', 'yuv420p',
+        '-r', String(fps),
+        'output.mp4'
+      );
       report(100);
 
       // Read output (slice to the view's byte range, not the whole WASM heap)

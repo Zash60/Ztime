@@ -168,7 +168,7 @@ class ConfigPanel {
 
   updateEstimate(est) {
     this.container.querySelector('#estimate').textContent =
-      `${est.frames} frames · ${est.seconds}s video · ${est.chunks} segment(s)`;
+      `${est.frames} frames · ${est.seconds}s video`;
   }
 
   clearEstimate() {

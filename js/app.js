@@ -60,12 +60,16 @@ class App {
         this.videoGenerator = new VideoGenerator(this.ffmpegLoader);
       }
 
-      const blob = await this.videoGenerator.generate(config, (percent) => {
-        this.configPanel.showProgress(percent);
-        this.configPanel.setStatus(
-          percent < 90 ? `Drawing frames… ${percent}%` : 'Encoding video…'
-        );
-      });
+      const blob = await this.videoGenerator.generate(
+        config,
+        (percent) => {
+          this.configPanel.showProgress(percent);
+          this.configPanel.setStatus(
+            percent < 90 ? `Drawing frames… ${percent}%` : 'Encoding video…'
+          );
+        },
+        (phase) => this.configPanel.setStatus(phase)
+      );
 
       // Download video
       const url = URL.createObjectURL(blob);

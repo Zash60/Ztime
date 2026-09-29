@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>VideoGenerator Test</title></head>
+<head><link rel="icon" href="data:,"><meta charset="utf-8"><title>VideoGenerator Test</title></head>
 <body>
 <script src="../js/ffmpeg-loader.js"></script>
 <script src="../js/timer.js"></script>
@@ -11,6 +11,11 @@ console.assert(typeof VideoGenerator === 'function', 'VideoGenerator must be a f
 // Test: generate() returns a promise
 const gen = new VideoGenerator();
 console.assert(typeof gen.generate === 'function', 'generate must be a function');
+// Test: frameTimes starts at 0 and always ends exactly at finalTimeMs
+const t60 = VideoGenerator.frameTimes(60000, 60);
+console.assert(t60.length === 3601, '60s at 60fps should give 3601 frame times, got ' + t60.length);
+console.assert(t60[0] === 0, 'first frame time must be 0');
+console.assert(t60[t60.length - 1] === 60000, 'last frame time must equal finalTimeMs');
 
 console.log('All VideoGenerator tests passed');
 </script>
