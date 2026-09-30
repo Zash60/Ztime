@@ -64,10 +64,21 @@ class VideoGenerator {
       return { ok: false, reason: 'H.264 support check failed: ' + (err && err.message ? err.message : err) };
     }
   }
+  // Base-path aware URL for the vendored muxer module. Resolves against
+  // the document so the app works from a domain root (local server) and
+  // from a project subpath (https://<user>.github.io/<repo/> on GitHub
+  // Pages), where a root-absolute "/vendor/..." URL 404s.
+  static muxerURL() {
+    if (typeof document !== 'undefined' && document.baseURI) {
+      return new URL('vendor/mediabunny/mediabunny.min.mjs', document.baseURI).href;
+    }
+    return '/vendor/mediabunny/mediabunny.min.mjs';
+  }
+
   // Mediabunny is vendored (no runtime CDN). The indirection through
   // _importMuxer exists so tests can stub the module.
   static _importMuxer() {
-    return import('/vendor/mediabunny/mediabunny.min.mjs');
+    return import(VideoGenerator.muxerURL());
   }
 
   // Loads (once, cached) and validates the muxer module. A failed load
