@@ -283,12 +283,54 @@ class ConfigPanel {
 
   showSuccess(message) {
     const box = this.container.querySelector('#successMsg');
-    if (box) box.textContent = message;
+    if (!box) return;
+    // Structured finish-line card when given { time, detail };
+    // plain string stays a simple status line for backwards compat.
+    try {
+      box.classList.remove('finish');
+    } catch (_) { /* test stubs */ }
+    if (message && typeof message === 'object') {
+      const time = String(message.time || '');
+      const detail = String(message.detail || '');
+      box.innerHTML = '';
+      const flag = document.createElement('div');
+      flag.className = 'finish-flag';
+      flag.setAttribute('aria-hidden', 'true');
+      const body = document.createElement('div');
+      body.className = 'finish-body';
+      const label = document.createElement('div');
+      label.className = 'finish-label';
+      label.textContent = 'Time!';
+      const timeEl = document.createElement('div');
+      timeEl.className = 'finish-time';
+      timeEl.textContent = time;
+      const detailEl = document.createElement('div');
+      detailEl.className = 'finish-detail';
+      detailEl.textContent = detail;
+      body.appendChild(label);
+      body.appendChild(timeEl);
+      if (detail) body.appendChild(detailEl);
+      box.appendChild(flag);
+      box.appendChild(body);
+      try {
+        box.classList.add('finish');
+      } catch (_) { /* test stubs */ }
+      return;
+    }
+    box.textContent = message;
   }
 
   clearSuccess() {
     const box = this.container.querySelector('#successMsg');
+    if (!box) return;
+    try {
+      box.classList.remove('finish');
+    } catch (_) { /* test stubs */ }
     if (box) box.textContent = '';
+    // innerHTML may hold the finish card; clear it without dropping the node.
+    try {
+      box.innerHTML = '';
+    } catch (_) { /* test stubs */ }
   }
 
   updateEstimate(est) {

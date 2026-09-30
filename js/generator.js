@@ -154,10 +154,10 @@ class VideoGenerator {
 
     const report = (() => {
       let lastRounded = -1;
-      return (percent) => {
+      return (percent, extra) => {
         if (onProgress && VideoGenerator.shouldReport(lastRounded, percent)) {
           lastRounded = Math.min(100, Math.round(percent));
-          onProgress(lastRounded);
+          onProgress(lastRounded, extra);
         }
       };
     })();
@@ -210,14 +210,18 @@ class VideoGenerator {
         // Yield periodically so the UI (incl. progress bar) stays responsive
         if (i % 60 === 0) await this._yieldToUI();
 
-        report(((i + 1) / plan.times.length) * 90);
+        report(((i + 1) / plan.times.length) * 90, {
+          frame: i + 1,
+          total: plan.times.length,
+          timeMs: plan.times[i] * 1000,
+        });
       }
 
       // Flush the encoder and finish the file
       this._checkCancelled();
       phase('Encoding video…');
       await output.finalize();
-      report(100);
+      report(100, { frame: plan.times.length, total: plan.times.length, timeMs: finalTimeMs });
 
       return new Blob([output.target.buffer], { type: 'video/mp4' });
     } catch (err) {

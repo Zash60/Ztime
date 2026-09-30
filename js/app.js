@@ -69,11 +69,27 @@ class App {
 
       const blob = await this.videoGenerator.generate(
         config,
-        (percent) => {
+        (percent, detail) => {
           this.configPanel.showProgress(percent);
-          this.configPanel.setStatus(
-            percent < 90 ? `Drawing frames… ${percent}%` : 'Encoding video…'
-          );
+          // Delight: truthful waiting. Show the exact frame and timer value
+          // being drawn, so a long render reads as run progress, not a stall.
+          // Falls back to the plain percent when detail is unavailable.
+          if (percent < 90 && detail && Number.isFinite(detail.timeMs)) {
+            let current = null;
+            try {
+              if (typeof TimerDisplay !== 'undefined' && TimerDisplay && typeof TimerDisplay.formatTime === 'function') {
+                current = TimerDisplay.formatTime(detail.timeMs, config.fps, config.format);
+              }
+            } catch (_) { current = null; }
+            const framePart = detail.frame && detail.total ? `Frame ${detail.frame}/${detail.total} · ` : '';
+            this.configPanel.setStatus(
+              current !== null ? `Drawing ${framePart}${current} — ${percent}%` : `Drawing frames… ${percent}%`
+            );
+          } else {
+            this.configPanel.setStatus(
+              percent < 90 ? `Drawing frames… ${percent}%` : 'Encoding video…'
+            );
+          }
         },
         (phase) => this.configPanel.setStatus(phase)
       );
@@ -85,14 +101,37 @@ class App {
       a.download = 'speedrun-timer.mp4';
       a.click();
       URL.revokeObjectURL(url);
-      this.configPanel.showSuccess(
-        `Run video saved — speedrun-timer.mp4 (${config.width}×${config.height}, ${config.fps} fps). Generate again to iterate on the split.`
-      );
+      // Delight thesis: crossing the finish line feels earned. The timer
+      // stops exactly on the split — "Time!" in speedrun voice, the final
+      // time in the timer's own mono, frozen on the monitor.
+      let finalLabel = null;
+      try {
+        if (typeof TimerDisplay !== 'undefined' && TimerDisplay && typeof TimerDisplay.formatTime === 'function') {
+          finalLabel = TimerDisplay.formatTime(config.finalTimeMs, config.fps, config.format);
+        }
+      } catch (_) { finalLabel = null; }
+      if (finalLabel !== null) {
+        this.configPanel.showSuccess({
+          time: finalLabel,
+          detail: `Run video saved — speedrun-timer.mp4 (${config.width}×${config.height}, ${config.fps} fps). Generate again to iterate on the split.`,
+        });
+      } else {
+        this.configPanel.showSuccess(
+          `Run video saved — speedrun-timer.mp4 (${config.width}×${config.height}, ${config.fps} fps). Generate again to iterate on the split.`
+        );
+      }
+      try {
+        if (this.preview && typeof this.preview.update === 'function') {
+          this.preview.update(config, config.finalTimeMs);
+        }
+      } catch (_) { /* preview payoff is optional */ }
     } catch (error) {
       // Cancel returns to idle silently; real failures keep the config and
       // offer a retry through the error panel (no alert popup).
+      // Delight: recovery with empathy — name the problem, keep the run setup.
       if (!error || error.code !== 'CANCELLED') {
-        this.configPanel.showError('Error generating video: ' + (error && error.message ? error.message : error));
+        const reason = error && error.message ? error.message : String(error);
+        this.configPanel.showError(`Run stopped — ${reason} Your settings are kept, try again when ready.`);
       }
     } finally {
       this.configPanel.hideProgress();

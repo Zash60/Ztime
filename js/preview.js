@@ -21,7 +21,7 @@ class Preview {
     } catch (_) { /* test stubs */ }
   }
 
-  update(config) {
+  update(config, timeMs = 0) {
     const { fps, width, height, background, font, format } = config;
 
     this.canvas.width = width;
@@ -32,13 +32,14 @@ class Preview {
       if (this.caption) this.caption.textContent = `${width}×${height} · ${background}`;
     } catch (_) { /* test stubs */ }
 
-    // Draw initial frame (time = 0) once the font is ready, so the preview
-    // never shows a fallback-font flash.
+    // Draw the requested frame (0 for live config, finalTimeMs for the
+    // finish-line payoff) once the font is ready, so the preview never
+    // shows a fallback-font flash.
     TimerDisplay.ensureFont(font).then(() => {
-      TimerDisplay.draw(this.canvas, 0, fps, { background, font, format });
+      TimerDisplay.draw(this.canvas, timeMs, fps, { background, font, format });
       try {
         if (this.canvas && typeof this.canvas.setAttribute === 'function') {
-          const label = TimerDisplay.formatTime(0, fps, format);
+          const label = TimerDisplay.formatTime(timeMs, fps, format);
           this.canvas.setAttribute('aria-label', `Timer preview showing ${label} at ${width} by ${height} pixels`);
         }
       } catch (_) { /* non-DOM test stubs */ }

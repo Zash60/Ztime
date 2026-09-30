@@ -4,23 +4,49 @@
   padding: 0;
 }
 
+/* Color roles as variables. Single identity: Oceano — deep blue with
+   electric cyan action. */
+:root {
+  --bg: #0a141f;
+  --panel: #0e2133;
+  --input-bg: #0a141f;
+  --border: #155e75;
+  --text: #e2f1f8;
+  --text-strong: #fff;
+  --text-dim: rgba(226, 241, 248, 0.78);
+  --text-faint: rgba(226, 241, 248, 0.68);
+  --accent: #22d3ee;
+  --accent-hover: #67e8f9;
+  --on-accent: #062a33;
+  --accent-wash: rgba(34, 211, 238, 0.12);
+  --accent-line: rgba(34, 211, 238, 0.45);
+  --success: #7bed9f;
+  --success-line: rgba(123, 237, 159, 0.35);
+  --error: #ff7a7a;
+  --field-error: #ff9c9c;
+  --warning: #ffd166;
+  --flag-bg: #060e15;
+  --flag-check: #e2f1f8;
+  --focus-contrast: #fff;
+}
+
 body {
   font-family: Arial, sans-serif;
-  background: #1a1a2e;
-  color: #eee;
+  background: var(--bg);
+  color: var(--text);
   padding: 32px 20px 48px;
   line-height: 1.5;
 }
 
 ::selection {
-  background: #e94560;
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 h1 {
   text-align: center;
   margin: 8px auto 28px;
-  color: #fff;
+  color: var(--text-strong);
   font-size: clamp(2.5rem, 1.4rem + 4vw, 4rem);
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -34,7 +60,7 @@ h1::after {
   display: block;
   width: 64px;
   height: 4px;
-  background: #e94560;
+  background: var(--accent);
   border-radius: 4px;
   margin: 16px auto 0;
 }
@@ -50,19 +76,19 @@ h1::after {
 #configContainer {
   flex: 0 1 420px;
   min-width: 320px;
-  background: #16213e;
+  background: var(--panel);
   padding: 24px;
   border-radius: 8px;
-  border: 1px solid #0f3460;
+  border: 1px solid var(--border);
 }
 
 #previewContainer {
   flex: 1.4 1 0;
   min-height: 440px;
-  background: #16213e;
+  background: var(--panel);
   padding: 24px;
   border-radius: 8px;
-  border: 1px solid #0f3460;
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,7 +99,7 @@ h1::after {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
-  color: #fff;
+  color: var(--text-strong);
   padding-bottom: 0;
   margin-bottom: 6px;
   border-bottom: none;
@@ -84,7 +110,7 @@ h1::after {
   display: block;
   width: 48px;
   height: 4px;
-  background: #e94560;
+  background: var(--accent);
   border-radius: 4px;
   margin: 12px 0 4px;
 }
@@ -97,7 +123,7 @@ h1::after {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(238, 238, 238, 0.78);
+  color: var(--text-dim);
 }
 
 .config-panel label:first-of-type {
@@ -108,17 +134,17 @@ h1::after {
 .config-panel select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #0f3460;
+  border: 1px solid var(--border);
   border-radius: 4px;
-  background: #1a1a2e;
-  color: #eee;
+  background: var(--input-bg);
+  color: var(--text);
   font-size: 16px;
   line-height: 1.4;
 }
 
 /* Grouped configuration: Timing / Output lead, Typography disclosed. */
 .cfg-group {
-  border: 1px solid #0f3460;
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 4px 14px 16px;
   margin-top: 18px;
@@ -131,7 +157,7 @@ h1::after {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--text-strong);
 }
 
 /* Bolder peak: Timing is the decisive move. Same brand, full strength —
@@ -139,8 +165,8 @@ h1::after {
    vendored timer voice, and one accent-wash readout (the single allowed
    addition: rgba(233,69,96,.10) to make the format result legible). */
 .config-panel fieldset.cfg-group:first-of-type {
-  background: #1a1a2e;
-  border-color: #0f3460;
+  background: var(--input-bg);
+  border-color: var(--border);
   padding-top: 8px;
   padding-bottom: 18px;
   margin-top: 20px;
@@ -158,8 +184,8 @@ h1::after {
 }
 
 .config-panel #finalTime::selection {
-  background: #e94560;
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .config-panel .format-example {
@@ -169,10 +195,10 @@ h1::after {
   font-size: 0.95rem;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
-  background: rgba(233, 69, 96, 0.1);
-  border: 1px solid rgba(233, 69, 96, 0.4);
+  background: var(--accent-wash);
+  border: 1px solid var(--accent-line);
   border-radius: 4px;
-  color: #fff;
+  color: var(--text-strong);
   overflow-wrap: break-word;
 }
 
@@ -190,13 +216,13 @@ h1::after {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--text-strong);
   cursor: pointer;
   list-style-position: inside;
 }
 
 .cfg-details summary:focus-visible {
-  outline: 2px solid #e94560;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -213,11 +239,11 @@ h1::after {
   margin-top: 6px;
   font-size: 0.82rem;
   line-height: 1.45;
-  color: rgba(238, 238, 238, 0.72);
+  color: var(--text-faint);
 }
 
 .hint-example {
-  color: rgba(238, 238, 238, 0.9);
+  color: var(--text);
 }
 
 .field-error {
@@ -225,7 +251,7 @@ h1::after {
   min-height: 0;
   font-size: 0.85rem;
   line-height: 1.4;
-  color: #ff8f8f;
+  color: var(--field-error);
 }
 
 .field-error:empty {
@@ -234,7 +260,7 @@ h1::after {
 
 .config-panel input[aria-invalid="true"],
 .config-panel select[aria-invalid="true"] {
-  border-color: #ff6b6b;
+  border-color: var(--error);
 }
 
 .format-example:empty {
@@ -242,23 +268,90 @@ h1::after {
 }
 
 .estimate-warning {
-  color: #ffd166;
+  color: var(--warning);
 }
 
 #successMsg {
+  margin-top: 12px;
   font-size: 14px;
-  color: #7bed9f;
+  line-height: 1.45;
+  color: var(--success);
 }
 
 #successMsg:empty {
   display: none;
 }
 
+/* Delight: finish-line card. The timer stops exactly on the split —
+   product character, not generic celebration. Checkered edge is the
+   race reference; mono time is the timer voice. */
+#successMsg.finish {
+  background: var(--bg);
+  border: 1px solid var(--success-line);
+  border-radius: 6px;
+  padding: 0 0 12px;
+  color: var(--text);
+  overflow: hidden;
+  animation: finish-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.finish-flag {
+  height: 8px;
+  background-color: var(--flag-bg);
+  background-image:
+    linear-gradient(45deg, var(--flag-check) 25%, transparent 25%, transparent 75%, var(--flag-check) 75%),
+    linear-gradient(45deg, var(--flag-check) 25%, transparent 25%, transparent 75%, var(--flag-check) 75%);
+  background-size: 12px 12px;
+  background-position: 0 0, 6px 6px;
+  opacity: 0.9;
+}
+
+.finish-body {
+  padding: 10px 14px 0;
+}
+
+.finish-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--success);
+}
+
+.finish-time {
+  margin-top: 2px;
+  font-family: 'JetBrains Mono', 'Space Mono', 'Share Tech Mono', ui-monospace, monospace;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+  overflow-wrap: break-word;
+}
+
+.finish-detail {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+@keyframes finish-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .config-panel input:focus-visible,
 .config-panel select:focus-visible {
-  outline: 2px solid #e94560;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-color: #e94560;
+  border-color: var(--accent);
 }
 
 .config-panel input[type="color"] {
@@ -271,8 +364,8 @@ h1::after {
   width: 100%;
   margin-top: 24px;
   padding: 14px;
-  background: #e94560;
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
   border: none;
   border-radius: 4px;
   font-size: 0.9rem;
@@ -284,7 +377,7 @@ h1::after {
 }
 
 .config-panel button:hover {
-  background: #ff6b6b;
+  background: var(--accent-hover);
   transform: translateY(-1px);
 }
 
@@ -300,44 +393,52 @@ h1::after {
 
 #cancelBtn {
   background: transparent;
-  border: 1px solid #e94560;
+  border: 1px solid var(--accent);
+  color: var(--text);
   margin-top: 10px;
+}
+
+#cancelBtn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--on-accent);
 }
 
 #estimate,
 #statusMsg {
   font-size: 14px;
-  color: #eee;
+  color: var(--text);
   opacity: 0.85;
+  font-variant-numeric: tabular-nums;
 }
 
 #retryBtn {
   margin-left: 8px;
   padding: 4px 12px;
   background: transparent;
-  border: 1px solid #ff6b6b;
+  border: 1px solid var(--error);
   border-radius: 4px;
-  color: #ff6b6b;
+  color: var(--error);
   font-size: 14px;
   cursor: pointer;
 }
 
 .config-panel button:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--focus-contrast);
   outline-offset: 2px;
 }
 
 #progressBar {
   margin-top: 16px;
   height: 8px;
-  background: #0f3460;
+  background: var(--border);
   border-radius: 10px;
   overflow: hidden;
 }
 
 #progressFill {
   height: 100%;
-  background: #e94560;
+  background: var(--accent);
   width: 0%;
 }
 
@@ -346,7 +447,7 @@ h1::after {
   min-height: 20px;
   font-size: 0.875rem;
   line-height: 1.4;
-  color: #ff6b6b;
+  color: var(--error);
 }
 
 #previewContainer canvas {
@@ -354,9 +455,9 @@ h1::after {
   height: auto;
   max-width: 100%;
   max-height: 100%;
-  border: 2px solid #0f3460;
+  border: 2px solid var(--border);
   border-radius: 4px;
-  background: #1a1a2e;
+  background: var(--input-bg);
 }
 
 /* Output-monitor treatment: the canvas is the screen, the caption names
@@ -376,12 +477,12 @@ h1::after {
   text-align: center;
   font-family: ui-monospace, monospace;
   font-size: 0.85rem;
-  color: rgba(238, 238, 238, 0.72);
+  color: var(--text-faint);
   overflow-wrap: break-word;
 }
 
 :focus-visible {
-  outline: 2px solid #e94560;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -390,13 +491,13 @@ h1::after {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a2e;
+  background: var(--bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0f3460;
+  background: var(--border);
   border-radius: 8px;
-  border: 2px solid #1a1a2e;
+  border: 2px solid var(--bg);
 }
 
 @media (max-width: 900px) {
@@ -422,5 +523,9 @@ h1::after {
 @media (prefers-reduced-motion: reduce) {
   .config-panel button {
     transition: none;
+  }
+
+  #successMsg.finish {
+    animation: none;
   }
 }
