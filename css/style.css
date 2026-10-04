@@ -1,345 +1,512 @@
+/* Ztime — Speedrun Timer Generator
+   Visual world: the category standard, executed at full fidelity.
+   Restrained color: neutrals plus one accent. Radius never above 10px.
+   Elevation is declared once, as a 1px border; no card carries a shadow. */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* Color roles as variables. Single identity: Oceano — deep blue with
-   electric cyan action. */
 :root {
-  --bg: #0a141f;
-  --panel: #0e2133;
-  --input-bg: #0a141f;
-  --border: #155e75;
-  --text: #e2f1f8;
-  --text-strong: #fff;
-  --text-dim: rgba(226, 241, 248, 0.78);
-  --text-faint: rgba(226, 241, 248, 0.68);
-  --accent: #22d3ee;
-  --accent-hover: #67e8f9;
-  --on-accent: #062a33;
-  --accent-wash: rgba(34, 211, 238, 0.12);
-  --accent-line: rgba(34, 211, 238, 0.45);
-  --success: #7bed9f;
-  --success-line: rgba(123, 237, 159, 0.35);
-  --error: #ff7a7a;
-  --field-error: #ff9c9c;
-  --warning: #ffd166;
-  --flag-bg: #060e15;
-  --flag-check: #e2f1f8;
-  --focus-contrast: #fff;
+  --ground: #eef1f5;
+  --surface: #ffffff;
+  --surface-sunken: #f6f8fa;
+  --line: #d7dce3;
+  --line-strong: #8a97a8;
+
+  --ink: #0f172a;
+  --ink-2: #475569;
+  --ink-3: #64748b;
+
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-ink: #ffffff;
+  --accent-wash: #eff4ff;
+  --accent-line: #c7d7fe;
+
+  --success: #15803d;
+  --success-wash: #f0fdf4;
+  --success-line: #bbf7d0;
+  --danger: #b91c1c;
+  --danger-wash: #fef2f2;
+  --danger-line: #fecaca;
+  --warning: #a16207;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23475569' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  padding: 32px 20px 48px;
+  font-family: var(--ui);
+  font-size: 15px;
   line-height: 1.5;
+  color: var(--ink);
+  background: var(--ground);
+  padding: 0 0 56px;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--accent-line);
+  color: var(--ink);
 }
 
-h1 {
-  text-align: center;
-  margin: 8px auto 28px;
-  color: var(--text-strong);
-  font-size: clamp(2.5rem, 1.4rem + 4vw, 4rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 0.95;
-  text-wrap: balance;
-  max-width: 20ch;
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-h1::after {
-  content: "";
-  display: block;
-  width: 64px;
-  height: 4px;
-  background: var(--accent);
-  border-radius: 4px;
-  margin: 16px auto 0;
-}
-
-#app {
-  display: flex;
-  gap: 24px;
-  max-width: 1280px;
-  margin: 0 auto;
-  align-items: stretch;
-}
-
-#configContainer {
-  flex: 0 1 420px;
-  min-width: 320px;
-  background: var(--panel);
-  padding: 24px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
-
-#previewContainer {
-  flex: 1.4 1 0;
-  min-height: 440px;
-  background: var(--panel);
-  padding: 24px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.config-panel h2 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  color: var(--text-strong);
-  padding-bottom: 0;
-  margin-bottom: 6px;
-  border-bottom: none;
-}
-
-.config-panel h2::after {
-  content: "";
-  display: block;
-  width: 48px;
-  height: 4px;
-  background: var(--accent);
-  border-radius: 4px;
-  margin: 12px 0 4px;
-}
-
-.config-panel label {
-  display: block;
-  margin-top: 16px;
-  margin-bottom: 6px;
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-}
-
-.config-panel label:first-of-type {
-  margin-top: 16px;
-}
-
-.config-panel input,
-.config-panel select {
+.shell {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--input-bg);
-  color: var(--text);
-  font-size: 16px;
-  line-height: 1.4;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-/* Grouped configuration: Timing / Output lead, Typography disclosed. */
+/* ---- Masthead ------------------------------------------------------- */
+
+.masthead {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.masthead-inner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.brand-tag {
+  margin-top: 2px;
+  font-size: 0.9375rem;
+  color: var(--ink-3);
+}
+
+.masthead-note {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+  max-width: 46ch;
+}
+
+/* ---- Layout --------------------------------------------------------- */
+
+.app {
+  display: grid;
+  grid-template-columns: 400px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding-top: 28px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  min-width: 0;
+}
+
+/* The preview is the thing being configured, so it stays in view while a
+   long configuration column scrolls past it. */
+.panel-preview {
+  position: sticky;
+  top: 24px;
+}
+
+.panel h2 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+/* ---- Grouped configuration ------------------------------------------ */
+
 .cfg-group {
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 4px 14px 16px;
-  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 2px 14px 16px;
+  margin-top: 16px;
   min-width: 0;
 }
 
 .cfg-group legend {
   padding: 0 8px;
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-size: 0.6875rem;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-strong);
+  color: var(--ink-2);
 }
 
-/* Bolder peak: Timing is the decisive move. Same brand, full strength —
-   elevated surface from the system's own palette, hero time entry in the
-   vendored timer voice, and one accent-wash readout (the single allowed
-   addition: rgba(233,69,96,.10) to make the format result legible). */
-.config-panel fieldset.cfg-group:first-of-type {
-  background: var(--input-bg);
-  border-color: var(--border);
-  padding-top: 8px;
-  padding-bottom: 18px;
-  margin-top: 20px;
+.cfg-group label {
+  display: block;
+  margin-top: 14px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-2);
 }
 
+.cfg-group label:first-of-type {
+  margin-top: 10px;
+}
+
+.config-panel input,
+.config-panel select {
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  caret-color: var(--accent);
+}
+
+.config-panel select {
+  appearance: none;
+  padding-right: 34px;
+  background-image: var(--chevron);
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  background-size: 10px 6px;
+  cursor: pointer;
+}
+
+.config-panel input:hover,
+.config-panel select:hover {
+  border-color: var(--ink-3);
+}
+
+.config-panel input:focus-visible,
+.config-panel select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.config-panel input[aria-invalid="true"],
+.config-panel select[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+/* The one measurement field a runner fills in: sunk, monospaced, and
+   sized so the digit rhythm is readable while typing. */
 .config-panel #finalTime {
-  font-family: 'JetBrains Mono', 'Space Mono', 'Share Tech Mono', ui-monospace, monospace;
-  font-size: 2rem;
+  font-family: var(--mono);
+  font-size: 1.75rem;
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
   padding: 12px 14px;
-  border-width: 1px;
+  background: var(--surface-sunken);
 }
 
-.config-panel #finalTime::selection {
-  background: var(--accent);
-  color: var(--on-accent);
+/* The placeholder is the format model, not decoration: it clears 4.5:1 on
+   the sunk field. */
+.config-panel #finalTime::placeholder {
+  color: var(--ink-2);
+  opacity: 1;
 }
 
-.config-panel .format-example {
+.format-example {
   margin-top: 10px;
-  padding: 10px 12px;
-  font-family: 'JetBrains Mono', 'Space Mono', ui-monospace, monospace;
-  font-size: 0.95rem;
-  line-height: 1.4;
+  padding: 9px 11px;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
   font-variant-numeric: tabular-nums;
-  background: var(--accent-wash);
-  border: 1px solid var(--accent-line);
-  border-radius: 4px;
-  color: var(--text-strong);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
   overflow-wrap: break-word;
-}
-
-.cfg-group label {
-  margin-top: 14px;
-}
-
-.cfg-details {
-  padding: 0 14px;
-}
-
-.cfg-details summary {
-  padding: 14px 0;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-strong);
-  cursor: pointer;
-  list-style-position: inside;
-}
-
-.cfg-details summary:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-.cfg-details label:first-of-type {
-  margin-top: 2px;
-}
-
-.cfg-details[open] {
-  padding-bottom: 16px;
-}
-
-.hint {
-  margin-top: 6px;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: var(--text-faint);
-}
-
-.hint-example {
-  color: var(--text);
-}
-
-.field-error {
-  margin-top: 6px;
-  min-height: 0;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  color: var(--field-error);
-}
-
-.field-error:empty {
-  display: none;
-}
-
-.config-panel input[aria-invalid="true"],
-.config-panel select[aria-invalid="true"] {
-  border-color: var(--error);
 }
 
 .format-example:empty {
   display: none;
 }
 
+/* ---- Disclosed group ------------------------------------------------ */
+
+.cfg-details {
+  padding: 0 14px;
+}
+
+.cfg-details summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style: none;
+}
+
+.cfg-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.cfg-details summary::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cfg-details[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.cfg-details[open] {
+  padding-bottom: 16px;
+}
+
+.cfg-details label:first-of-type {
+  margin-top: 0;
+}
+
+/* Each typeface option is set in the face it exports as. */
+.config-panel #fontFamily {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.config-panel input[type="color"] {
+  height: 42px;
+  padding: 5px 6px;
+  cursor: pointer;
+}
+
+/* A white swatch needs its own edge to read as a colour chip. */
+.config-panel input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.config-panel input[type="color"]::-webkit-color-swatch {
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+}
+
+/* ---- Supporting text ------------------------------------------------ */
+
+.hint {
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.hint-example {
+  color: var(--ink-2);
+}
+
+.field-error {
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  font-weight: 500;
+  color: var(--danger);
+}
+
+.field-error:empty {
+  display: none;
+}
+
+/* ---- Actions and readouts ------------------------------------------- */
+
+.panel-actions {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.config-panel button {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 140ms ease-out, border-color 140ms ease-out,
+    color 140ms ease-out;
+}
+
+.config-panel #generateBtn {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.config-panel #generateBtn:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.config-panel #cancelBtn {
+  display: none;
+  margin-top: 8px;
+  background: var(--surface);
+  border-color: var(--line-strong);
+  color: var(--ink-2);
+}
+
+.config-panel #cancelBtn:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+/* Busy, not broken: the button empties instead of fading, so its label
+   survives the longest wait in the product. */
+.config-panel #generateBtn:disabled {
+  background: var(--accent-wash);
+  border-color: var(--accent-line);
+  color: var(--ink-2);
+  cursor: default;
+}
+
+.config-panel button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.readout {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.readout:empty {
+  display: none;
+}
+
+#estimate {
+  margin-top: 14px;
+}
+
+#statusMsg {
+  margin-top: 6px;
+}
+
 .estimate-warning {
   color: var(--warning);
 }
 
-#successMsg {
-  margin-top: 12px;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--success);
-}
-
-#successMsg:empty {
-  display: none;
-}
-
-/* Delight: finish-line card. The timer stops exactly on the split —
-   product character, not generic celebration. Checkered edge is the
-   race reference; mono time is the timer voice. */
-#successMsg.finish {
-  background: var(--bg);
-  border: 1px solid var(--success-line);
-  border-radius: 6px;
-  padding: 0 0 12px;
-  color: var(--text);
+#progressBar {
+  margin-top: 14px;
+  height: 6px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--line);
+  border-radius: 999px;
   overflow: hidden;
-  animation: finish-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.finish-flag {
-  height: 8px;
-  background-color: var(--flag-bg);
-  background-image:
-    linear-gradient(45deg, var(--flag-check) 25%, transparent 25%, transparent 75%, var(--flag-check) 75%),
-    linear-gradient(45deg, var(--flag-check) 25%, transparent 25%, transparent 75%, var(--flag-check) 75%);
-  background-size: 12px 12px;
-  background-position: 0 0, 6px 6px;
-  opacity: 0.9;
+#progressFill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
 }
 
-.finish-body {
-  padding: 10px 14px 0;
+#successMsg,
+#errorMsg {
+  margin-top: 12px;
+}
+
+/* The error is a card with the same geometry as the finish card: both are
+   terminal states and must not read as different systems. */
+#errorMsg {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--danger);
+  background: var(--danger-wash);
+  border: 1px solid var(--danger-line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+/* Finish state: the timer stops exactly on the split. The split is shown in
+   the timer's own monospaced voice; the surrounding card reports the file. */
+#successMsg.finish {
+  background: var(--success-wash);
+  border: 1px solid var(--success-line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--ink);
+  animation: settle 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .finish-label {
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-family: var(--ui);
+  font-size: 0.6875rem;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--success);
 }
 
 .finish-time {
-  margin-top: 2px;
-  font-family: 'JetBrains Mono', 'Space Mono', 'Share Tech Mono', ui-monospace, monospace;
-  font-size: 1.4rem;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 1.375rem;
+  font-weight: 400;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-  color: var(--text-strong);
+  color: var(--ink);
   overflow-wrap: break-word;
 }
 
 .finish-detail {
-  margin-top: 4px;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  color: var(--text-dim);
+  margin-top: 6px;
+  font-family: var(--ui);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-2);
 }
 
-@keyframes finish-in {
+@keyframes settle {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -347,121 +514,29 @@ h1::after {
   }
 }
 
-.config-panel input:focus-visible,
-.config-panel select:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-color: var(--accent);
-}
-
-.config-panel input[type="color"] {
-  height: 44px;
-  padding: 4px 6px;
-  cursor: pointer;
-}
-
-.config-panel button {
-  width: 100%;
-  margin-top: 24px;
-  padding: 14px;
-  background: var(--accent);
-  color: var(--on-accent);
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 180ms cubic-bezier(0.16, 1, 0.3, 1), transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.config-panel button:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-}
-
-.config-panel button:active {
-  transform: translateY(0);
-}
-
-.config-panel button:disabled {
-  opacity: 0.55;
-  cursor: wait;
-  transform: none;
-}
-
-#cancelBtn {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--text);
-  margin-top: 10px;
-}
-
-#cancelBtn:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-  color: var(--on-accent);
-}
-
-#estimate,
-#statusMsg {
-  font-size: 14px;
-  color: var(--text);
-  opacity: 0.85;
-  font-variant-numeric: tabular-nums;
+#errorMsg:empty {
+  display: none;
 }
 
 #retryBtn {
-  margin-left: 8px;
-  padding: 4px 12px;
-  background: transparent;
-  border: 1px solid var(--error);
-  border-radius: 4px;
-  color: var(--error);
-  font-size: 14px;
-  cursor: pointer;
+  display: block;
+  width: auto;
+  margin: 10px 0 0;
+  padding: 5px 12px;
+  background: var(--surface);
+  border-color: var(--danger-line);
+  border-radius: 5px;
+  color: var(--danger);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
-.config-panel button:focus-visible {
-  outline: 2px solid var(--focus-contrast);
-  outline-offset: 2px;
+#retryBtn:hover {
+  background: var(--danger-wash);
 }
 
-#progressBar {
-  margin-top: 16px;
-  height: 8px;
-  background: var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
+/* ---- Preview -------------------------------------------------------- */
 
-#progressFill {
-  height: 100%;
-  background: var(--accent);
-  width: 0%;
-}
-
-#errorMsg {
-  margin-top: 12px;
-  min-height: 20px;
-  font-size: 0.875rem;
-  line-height: 1.4;
-  color: var(--error);
-}
-
-#previewContainer canvas {
-  width: 100%;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  border: 2px solid var(--border);
-  border-radius: 4px;
-  background: var(--input-bg);
-}
-
-/* Output-monitor treatment: the canvas is the screen, the caption names
-   the real export dimensions underneath it. */
 .monitor {
   margin: 0;
   width: 100%;
@@ -470,58 +545,95 @@ h1::after {
 
 .monitor canvas {
   display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: #000;
 }
 
 .monitor-caption {
   margin-top: 10px;
   text-align: center;
-  font-family: ui-monospace, monospace;
-  font-size: 0.85rem;
-  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
   overflow-wrap: break-word;
 }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+/* ---- Browser surfaces ----------------------------------------------- */
 
 ::-webkit-scrollbar {
   width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: var(--ground);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 8px;
-  border: 2px solid var(--bg);
+  background: var(--line-strong);
+  border: 3px solid var(--ground);
+  border-radius: 999px;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-3);
+}
+
+/* ---- Responsive ----------------------------------------------------- */
+
 @media (max-width: 900px) {
-  #app {
-    flex-direction: column;
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 20px;
   }
 
-  #configContainer {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  #previewContainer {
-    min-height: 320px;
+  .panel-preview {
     order: -1;
+    position: static;
   }
 
-  h1 {
-    margin-bottom: 20px;
+  .masthead-note {
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .shell {
+    padding: 0 14px;
+  }
+
+  .masthead-inner {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .app {
+    gap: 16px;
+    padding-bottom: 8px;
+  }
+
+  .panel {
+    padding: 16px 14px;
+  }
+
+  /* 16px keeps mobile keyboards from zooming the page on focus. */
+  .config-panel input,
+  .config-panel select {
+    font-size: 1rem;
+  }
+
+  .config-panel #finalTime {
+    font-size: 1.5rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .config-panel button {
+  .config-panel button,
+  .cfg-details summary::before {
     transition: none;
   }
 

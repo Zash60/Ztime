@@ -25,15 +25,41 @@ class ConfigPanel {
 
   // Single source of truth for the font select. Values must match the
   // @font-face family names in css/fonts.css (plus the generic fallback).
+  // `cssFamily` quotes the name for direct use in a CSS font-family.
+  //
+  // Every entry is monospaced or carries tabular figures, so the exported
+  // timer's digits do not shift horizontally between frames. That property is
+  // what makes the frame-accurate claim honest, so a proportional face does
+  // not belong on this list.
   static getFontFamilies() {
     return [
-      { value: 'JetBrains Mono', label: 'JetBrains Mono' },
-      { value: 'Space Mono', label: 'Space Mono' },
-      { value: 'Share Tech Mono', label: 'Share Tech Mono' },
-      { value: 'Ubuntu Mono', label: 'Ubuntu Mono' },
-      { value: 'Cascadia Code', label: 'Cascadia Code' },
-      { value: 'VT323', label: 'VT323' },
-      { value: 'monospace', label: 'System monospace' },
+      { value: 'JetBrains Mono', label: 'JetBrains Mono', cssFamily: "'JetBrains Mono', monospace" },
+      { value: 'Space Mono', label: 'Space Mono', cssFamily: "'Space Mono', monospace" },
+      { value: 'Share Tech Mono', label: 'Share Tech Mono', cssFamily: "'Share Tech Mono', monospace" },
+      { value: 'Ubuntu Mono', label: 'Ubuntu Mono', cssFamily: "'Ubuntu Mono', monospace" },
+      { value: 'Cascadia Code', label: 'Cascadia Code', cssFamily: "'Cascadia Code', monospace" },
+      { value: 'VT323', label: 'VT323', cssFamily: "'VT323', monospace" },
+      { value: 'Roboto Mono', label: 'Roboto Mono', cssFamily: "'Roboto Mono', monospace" },
+      { value: 'IBM Plex Mono', label: 'IBM Plex Mono', cssFamily: "'IBM Plex Mono', monospace" },
+      { value: 'Source Code Pro', label: 'Source Code Pro', cssFamily: "'Source Code Pro', monospace" },
+      { value: 'Fira Code', label: 'Fira Code', cssFamily: "'Fira Code', monospace" },
+      { value: 'Inconsolata', label: 'Inconsolata', cssFamily: "'Inconsolata', monospace" },
+      { value: 'PT Mono', label: 'PT Mono', cssFamily: "'PT Mono', monospace" },
+      { value: 'Noto Sans Mono', label: 'Noto Sans Mono', cssFamily: "'Noto Sans Mono', monospace" },
+      { value: 'DM Mono', label: 'DM Mono', cssFamily: "'DM Mono', monospace" },
+      { value: 'Anonymous Pro', label: 'Anonymous Pro', cssFamily: "'Anonymous Pro', monospace" },
+      { value: 'Cutive Mono', label: 'Cutive Mono', cssFamily: "'Cutive Mono', monospace" },
+      { value: 'Cousine', label: 'Cousine', cssFamily: "'Cousine', monospace" },
+      { value: 'Overpass Mono', label: 'Overpass Mono', cssFamily: "'Overpass Mono', monospace" },
+      { value: 'Red Hat Mono', label: 'Red Hat Mono', cssFamily: "'Red Hat Mono', monospace" },
+      { value: 'Azeret Mono', label: 'Azeret Mono', cssFamily: "'Azeret Mono', monospace" },
+      { value: 'Martian Mono', label: 'Martian Mono', cssFamily: "'Martian Mono', monospace" },
+      { value: 'Sometype Mono', label: 'Sometype Mono', cssFamily: "'Sometype Mono', monospace" },
+      { value: 'Spline Sans Mono', label: 'Spline Sans Mono', cssFamily: "'Spline Sans Mono', monospace" },
+      { value: 'B612 Mono', label: 'B612 Mono', cssFamily: "'B612 Mono', monospace" },
+      { value: 'Kode Mono', label: 'Kode Mono', cssFamily: "'Kode Mono', monospace" },
+      { value: 'Fragment Mono', label: 'Fragment Mono', cssFamily: "'Fragment Mono', monospace" },
+      { value: 'monospace', label: 'System monospace', cssFamily: 'monospace' },
     ];
   }
 
@@ -54,7 +80,7 @@ class ConfigPanel {
           <p class="field-error" id="finalTimeError" aria-live="polite"></p>
 
           <label for="fps">Frames per second</label>
-          <input type="number" id="fps" value="60" min="1" max="240" step="1"
+          <input type="number" id="fps" value="60" min="1" max="240" step="any"
             aria-describedby="fpsHint fpsError">
           <p class="hint" id="fpsHint">Match your recording: 30 for most captures, 60 for smooth splits.</p>
           <p class="field-error" id="fpsError" aria-live="polite"></p>
@@ -102,7 +128,7 @@ class ConfigPanel {
 
           <label for="fontFamily">Font family</label>
           <select id="fontFamily">
-            ${ConfigPanel.getFontFamilies().map((f, i) => `<option value="${f.value}"${i === 0 ? ' selected' : ''}>${f.label}</option>`).join('')}
+            ${ConfigPanel.getFontFamilies().map((f, i) => `<option value="${f.value}" style="font-family: ${f.cssFamily}"${i === 0 ? ' selected' : ''}>${f.label}</option>`).join('')}
           </select>
 
           <label for="fontSize">Font size (px)</label>
@@ -115,15 +141,17 @@ class ConfigPanel {
           <input type="color" id="fontColor" value="#ffffff">
         </details>
 
-        <button id="generateBtn">Generate Video</button>
-        <button id="cancelBtn" style="display:none;">Cancel</button>
-        <div id="estimate" style="min-height:20px;margin-top:6px;" aria-live="polite"></div>
-        <div id="statusMsg" aria-live="polite" style="min-height:20px;margin-top:6px;"></div>
+        <div class="panel-actions">
+          <button id="generateBtn">Generate Video</button>
+          <button id="cancelBtn" style="display:none;">Cancel</button>
+        </div>
+        <div id="estimate" class="readout" aria-live="polite"></div>
+        <div id="statusMsg" class="readout"></div>
         <div id="progressBar" style="display:none;" role="progressbar" aria-label="Video generation progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <div id="progressFill"></div>
         </div>
-        <div id="successMsg" role="status" style="min-height:20px;margin-top:6px;"></div>
-        <div id="errorMsg" role="alert" style="color:#ff6b6b;"></div>
+        <div id="successMsg" class="readout" role="status"></div>
+        <div id="errorMsg" role="alert"></div>
       </div>
     `;
 
@@ -148,7 +176,19 @@ class ConfigPanel {
     if (fps && typeof fps.addEventListener === 'function') {
       fps.addEventListener('input', () => this.updateFormatExample());
     }
+    const fontFamily = this.container.querySelector('#fontFamily');
+    if (fontFamily && typeof fontFamily.addEventListener === 'function') {
+      fontFamily.addEventListener('change', () => this.applyFontPreview(fontFamily));
+      this.applyFontPreview(fontFamily);
+    }
     this.updateFormatExample();
+  }
+
+  // The closed select shows the face the export will use, so the choice is
+  // made by looking rather than by reading the name.
+  applyFontPreview(select) {
+    const match = ConfigPanel.getFontFamilies().find((f) => f.value === select.value);
+    select.style.fontFamily = match ? match.cssFamily : 'monospace';
   }
 
   // Live example string beside the format select: reformats the current
@@ -293,9 +333,6 @@ class ConfigPanel {
       const time = String(message.time || '');
       const detail = String(message.detail || '');
       box.innerHTML = '';
-      const flag = document.createElement('div');
-      flag.className = 'finish-flag';
-      flag.setAttribute('aria-hidden', 'true');
       const body = document.createElement('div');
       body.className = 'finish-body';
       const label = document.createElement('div');
@@ -310,7 +347,6 @@ class ConfigPanel {
       body.appendChild(label);
       body.appendChild(timeEl);
       if (detail) body.appendChild(detailEl);
-      box.appendChild(flag);
       box.appendChild(body);
       try {
         box.classList.add('finish');

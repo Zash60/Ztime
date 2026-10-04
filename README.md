@@ -8,7 +8,7 @@ Generate pixel-accurate MP4 videos of a speedrun timer counting from 0 to your f
 - **Configurable FPS** — 1–240, including fractional rates (23.976, 29.97, 59.94)
 - **Multiple resolutions** — HD 720p, Full HD 1080p, 4K
 - **10 timer formats** — from `M:SS.mmm` to `H:MM:SS` and centisecond/decisecond variants
-- **6 vendored monospace fonts** — JetBrains Mono, Space Mono, Share Tech Mono, Ubuntu Mono, Cascadia Code, VT323 — no system-font dependency
+- **26 vendored monospace fonts** — JetBrains Mono, Space Mono, Share Tech Mono, Ubuntu Mono, Cascadia Code, VT323, Roboto Mono, IBM Plex Mono, Source Code Pro, Fira Code, Inconsolata, PT Mono, Noto Sans Mono, DM Mono, Anonymous Pro, Cutive Mono, Cousine, Overpass Mono, Red Hat Mono, Azeret Mono, Martian Mono, Sometype Mono, Spline Sans Mono, B612 Mono, Kode Mono, Fragment Mono — no CDN, no system-font dependency
 - **Hardware-accelerated encoding** — WebCodecs H.264 with realtime latency mode
 - **100% offline** — no server, no CDN, no upload; everything runs in your browser
 - **Live preview** — see the timer before you generate
@@ -41,7 +41,7 @@ Any static file server works — no build step, no dependencies.
 | FPS | 1–240 | 60 |
 | Resolution | 1280×720, 1920×1080, 3840×2160 | 1920×1080 |
 | Background | Black, White, Red, Green, Blue | Black |
-| Font family | 6 vendored monospace faces | JetBrains Mono |
+| Font family | 26 vendored monospace faces + system fallback | JetBrains Mono |
 | Font size | 8–200 px | 180 |
 | Font color | Any hex color | `#ffffff` |
 | Time format | 10 formats (mmm, cc, d, s, hmmm, hcc, hd, hs, ssmmm, sscc, ssd) | `M:SS.mmm` |
@@ -63,8 +63,8 @@ Any static file server works — no build step, no dependencies.
 | Safari | 16.4+ | Full hardware encode |
 | Firefox | — | Not supported (no WebCodecs H.264 encoder) |
 
-The app detects unsupported browsers and shows a clear message before you start.
+Unsupported browsers fail at generation time with an explanatory message and a retry, keeping your settings — the encode is only attempted once you press Generate.
 
 ## License
 
-Code: MIT (see commit history). Fonts: SIL Open Font License 1.1 / Ubuntu Font License 1.0 (see `fonts/`). Mediabunny: MPL-2.0 (see `vendor/mediabunny/LICENSE`).
+Code: MIT (see commit history). Fonts: SIL Open Font License 1.1 / Ubuntu Font License 1.0 (see `fonts/ATTRIBUTION.md`). Mediabunny: MPL-2.0 (see `vendor/mediabunny/LICENSE`).

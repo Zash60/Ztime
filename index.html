@@ -4,16 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Speedrun Timer Generator</title>
+  <meta name="description" content="Generate frame-accurate MP4 speedrun timer videos in your browser. Nothing is uploaded.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/fonts.css">
 </head>
 <body>
-  <h1>Speedrun Timer Generator</h1>
-  <div id="app">
-    <div id="configContainer"></div>
-    <div id="previewContainer"></div>
-  </div>
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand">
+        <h1 class="brand-name">Ztime</h1>
+        <p class="brand-tag">Speedrun Timer Generator</p>
+      </div>
+      <p class="masthead-note">Frame-accurate MP4 timers, rendered entirely in your browser. Nothing is uploaded.</p>
+    </div>
+  </header>
+
+  <main class="shell app" id="app">
+    <div id="configContainer" class="panel panel-config"></div>
+    <div id="previewContainer" class="panel panel-preview"></div>
+  </main>
+
   <script src="js/timer.js"></script>
   <script src="js/generator.js"></script>
   <script src="js/config.js"></script>
