@@ -121,6 +121,15 @@ class ConfigPanel {
             <option value="#00ff00">Green</option>
             <option value="#0000ff">Blue</option>
           </select>
+
+          <div class="save-row" id="saveRow">
+            <label class="save-disk" for="saveToDisk">
+              <input type="checkbox" id="saveToDisk">
+              <span>Stream to disk
+                <small>Pick a file up front and the MP4 is written straight to it as it encodes. Uses far less memory on long or 4K exports. Chrome and Edge only.</small>
+              </span>
+            </label>
+          </div>
         </fieldset>
 
         <details class="cfg-group cfg-details">
@@ -154,6 +163,13 @@ class ConfigPanel {
         <div id="errorMsg" role="alert"></div>
       </div>
     `;
+
+    // The disk-stream toggle only makes sense where the File System Access
+    // API exists — hide it elsewhere instead of offering a dead control.
+    const saveRow = this.container.querySelector('#saveRow');
+    if (saveRow && typeof window !== 'undefined' && typeof window.showSaveFilePicker !== 'function') {
+      saveRow.remove();
+    }
 
     this.container.querySelector('#generateBtn').addEventListener('click', () => {
       if (this.generateCallback) this.generateCallback();
@@ -231,6 +247,7 @@ class ConfigPanel {
   getConfig() {
     const [width, height] = this.container.querySelector('#resolution').value.split('x').map(Number);
     const finalTimeMs = ConfigPanel.parseTime(this.container.querySelector('#finalTime').value);
+    const saveBox = this.container.querySelector('#saveToDisk');
 
     return {
       fps: parseFloat(this.container.querySelector('#fps').value),
@@ -238,6 +255,7 @@ class ConfigPanel {
       width,
       height,
       background: this.container.querySelector('#background').value,
+      saveToDisk: !!(saveBox && saveBox.checked),
       font: {
         family: this.container.querySelector('#fontFamily').value,
         size: parseFloat(this.container.querySelector('#fontSize').value),

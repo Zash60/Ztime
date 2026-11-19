@@ -18,7 +18,7 @@
 
   --ink: #0f172a;
   --ink-2: #475569;
-  --ink-3: #64748b;
+  --ink-3: #55637a;
 
   --accent: #1d4ed8;
   --accent-hover: #1e40af;
@@ -583,6 +583,38 @@ body {
   background: var(--ink-3);
 }
 
+/* ---- Footer --------------------------------------------------------- */
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+  padding: 18px 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+.site-footer-inner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+.site-footer-note {
+  font-size: 0.75rem;
+}
+
 /* ---- Responsive ----------------------------------------------------- */
 
 @media (max-width: 900px) {
@@ -640,4 +672,38 @@ body {
   #successMsg.finish {
     animation: none;
   }
+}
+/* Disk streaming toggle (File System Access API, Output group) */
+.save-row {
+  margin-top: 14px;
+  border-top: 1px dashed var(--accent-line, #e2e8f0);
+  padding-top: 12px;
+}
+
+.save-disk {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.save-disk input {
+  margin: 2px 0 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.save-disk small {
+  display: block;
+  margin-top: 3px;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-3);
 }

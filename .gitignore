@@ -5,3 +5,8 @@ speedrun-timer-demo.mp4
 .playwright-mcp/
 .superpowers/
 .impeccable/
+
+# Local capture artifacts
+.captured-*
+ztime-dom-captured.html
+mcp-test-*.png

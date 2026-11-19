@@ -9,7 +9,9 @@ Generate pixel-accurate MP4 videos of a speedrun timer counting from 0 to your f
 - **Multiple resolutions** — HD 720p, Full HD 1080p, 4K
 - **10 timer formats** — from `M:SS.mmm` to `H:MM:SS` and centisecond/decisecond variants
 - **26 vendored monospace fonts** — JetBrains Mono, Space Mono, Share Tech Mono, Ubuntu Mono, Cascadia Code, VT323, Roboto Mono, IBM Plex Mono, Source Code Pro, Fira Code, Inconsolata, PT Mono, Noto Sans Mono, DM Mono, Anonymous Pro, Cutive Mono, Cousine, Overpass Mono, Red Hat Mono, Azeret Mono, Martian Mono, Sometype Mono, Spline Sans Mono, B612 Mono, Kode Mono, Fragment Mono — no CDN, no system-font dependency
-- **Hardware-accelerated encoding** — WebCodecs H.264 with realtime latency mode
+- **Hardware-accelerated encoding** — WebCodecs H.264 with realtime latency mode, running in a dedicated Web Worker (the UI stays responsive and the muxing never blocks the main thread)
+- **Optional disk streaming** — with the File System Access API (Chrome/Edge) the MP4 is written straight to the file you pick as it encodes instead of being buffered in memory — a big win on long or 4K exports
+- **Per-export timing breakdown** — paint / encode / finalize timings are logged to the console on every export
 - **100% offline** — no server, no CDN, no upload; everything runs in your browser
 - **Live preview** — see the timer before you generate
 - **Cancel anytime** — stop generation mid-encode without losing your config
@@ -41,6 +43,7 @@ Any static file server works — no build step, no dependencies.
 | FPS | 1–240 | 60 |
 | Resolution | 1280×720, 1920×1080, 3840×2160 | 1920×1080 |
 | Background | Black, White, Red, Green, Blue | Black |
+| Stream to disk | Off/on — pick a file, MP4 is streamed to it as it encodes (Chrome/Edge) | Off |
 | Font family | 26 vendored monospace faces + system fallback | JetBrains Mono |
 | Font size | 8–200 px | 180 |
 | Font color | Any hex color | `#ffffff` |
@@ -50,7 +53,7 @@ Any static file server works — no build step, no dependencies.
 
 1. **Frame plan** — the generator computes exact display times for every frame, starting at `00:00.000` and ending precisely on your final split
 2. **Canvas rendering** — each frame is painted on a `<canvas>` with the selected font, color, and format
-3. **Hardware encode** — frames are fed to WebCodecs H.264 in realtime mode (no B-frames, no pipeline delay)
+3. **Hardware encode** — frames are painted on the main thread (it owns the vendored fonts) as transferable `ImageBitmap`s and encoded in a **dedicated Web Worker** via WebCodecs H.264 in realtime mode (no B-frames, no pipeline delay); when disk streaming is enabled the muxer writes straight into a `FileSystemWritableFileStream` instead of memory
 4. **MP4 muxing** — [Mediabunny](https://github.com/Vanilagy/mediabunny) (vendored, MPL-2.0) packages the encoded stream into a standards-compliant MP4
 5. **Download** — the finished file saves directly to your device
 
@@ -67,4 +70,4 @@ Unsupported browsers fail at generation time with an explanatory message and a r
 
 ## License
 
-Code: MIT (see commit history). Fonts: SIL Open Font License 1.1 / Ubuntu Font License 1.0 (see `fonts/ATTRIBUTION.md`). Mediabunny: MPL-2.0 (see `vendor/mediabunny/LICENSE`).
+Code: MIT (see `LICENSE`). Fonts: SIL Open Font License 1.1 / Ubuntu Font License 1.0 (see `fonts/ATTRIBUTION.md`). Mediabunny: MPL-2.0 (see `vendor/mediabunny/LICENSE`).

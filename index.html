@@ -3,9 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Speedrun Timer Generator</title>
+  <title>Ztime — Speedrun Timer Generator</title>
   <meta name="description" content="Generate frame-accurate MP4 speedrun timer videos in your browser. Nothing is uploaded.">
-  <link rel="icon" href="data:,">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f172a'/%3E%3Ctext x='32' y='44' font-family='ui-monospace,Menlo,monospace' font-size='30' fill='%23ffffff' text-anchor='middle'%3E0:00%3C/text%3E%3C/svg%3E">
+  <link rel="canonical" href="https://zash60.github.io/Ztime/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ztime">
+  <meta property="og:title" content="Ztime — Speedrun Timer Generator">
+  <meta property="og:description" content="Frame-accurate MP4 timers rendered entirely in your browser. Nothing is uploaded.">
+  <meta property="og:image" content="https://zash60.github.io/Ztime/screenshots/desktop.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ztime — Speedrun Timer Generator">
+  <meta name="twitter:description" content="Frame-accurate MP4 timers rendered entirely in your browser. Nothing is uploaded.">
+  <meta name="twitter:image" content="https://zash60.github.io/Ztime/screenshots/desktop.png">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/fonts.css">
 </head>
@@ -24,6 +35,19 @@
     <div id="configContainer" class="panel panel-config"></div>
     <div id="previewContainer" class="panel panel-preview"></div>
   </main>
+
+  <noscript>
+    <div class="shell" style="padding: 24px;">
+      <p><strong>Ztime needs JavaScript.</strong> The timer is rendered and the MP4 is encoded entirely in your browser — no server involved — so the app cannot start without JavaScript enabled.</p>
+    </div>
+  </noscript>
+
+  <footer class="site-footer">
+    <div class="shell site-footer-inner">
+      <p>Ztime — free and open source. <a href="https://github.com/Zash60/Ztime" rel="noopener noreferrer">Source on GitHub</a>.</p>
+      <p class="site-footer-note">No uploads, no accounts, no tracking.</p>
+    </div>
+  </footer>
 
   <script src="js/timer.js"></script>
   <script src="js/generator.js"></script>

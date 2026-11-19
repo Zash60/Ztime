@@ -67,7 +67,7 @@ class App {
         this.videoGenerator = new VideoGenerator();
       }
 
-      const blob = await this.videoGenerator.generate(
+      const result = await this.videoGenerator.generate(
         config,
         (percent, detail) => {
           this.configPanel.showProgress(percent);
@@ -94,13 +94,18 @@ class App {
         (phase) => this.configPanel.setStatus(phase)
       );
 
-      // Download video
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'speedrun-timer.mp4';
-      a.click();
-      URL.revokeObjectURL(url);
+      const fileName = (result && result.suggestedName) || 'speedrun-timer.mp4';
+      if (result && result.streamed) {
+        // The MP4 was written straight to the file the user picked.
+      } else {
+        // Download video
+        const url = URL.createObjectURL(result.blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
       // Delight thesis: crossing the finish line feels earned. The timer
       // stops exactly on the split — "Time!" in speedrun voice, the final
       // time in the timer's own mono, frozen on the monitor.
@@ -110,14 +115,17 @@ class App {
           finalLabel = TimerDisplay.formatTime(config.finalTimeMs, config.fps, config.format);
         }
       } catch (_) { finalLabel = null; }
+      const destination = result && result.streamed
+        ? `${fileName} (streamed to disk)`
+        : fileName;
       if (finalLabel !== null) {
         this.configPanel.showSuccess({
           time: finalLabel,
-          detail: `Run video saved — speedrun-timer.mp4 (${config.width}×${config.height}, ${config.fps} fps). Generate again to iterate on the split.`,
+          detail: `Run video saved — ${destination} (${config.width}×${config.height}, ${config.fps} fps). Generate again to iterate on the split.`,
         });
       } else {
         this.configPanel.showSuccess(
-          `Run video saved — speedrun-timer.mp4 (${config.width}×${config.height}, ${config.fps} fps). Generate again to iterate on the split.`
+          `Run video saved — ${destination} (${config.width}×${config.height}, ${config.fps} fps). Generate again to iterate on the split.`
         );
       }
       try {
