@@ -45,7 +45,7 @@
 
 /* Second batch (Fontsource 5.3.0, latin 400 woff2). Every face here is
    monospaced or carries tabular figures — see the Measurement Voice rule in
-   DESIGN.md. All are SIL Open Font License 1.1; licenses ship alongside. */
+   the fonts/ directory. All are SIL Open Font License 1.1; licenses ship alongside. */
 @font-face {
   font-family: 'Roboto Mono';
   src: url('../fonts/roboto-mono-latin-400-normal.woff2') format('woff2');
